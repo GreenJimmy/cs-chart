@@ -1,0 +1,83 @@
+// @import 'https://capabilitysource.com/static/css/Home.d883f6a4.chunk.css';
+// @import 'https://capabilitysource.com/static/css/Home.d883f6a4.chunk.css';
+@import '../../../node_modules/bootstrap/scss/bootstrap.scss';
+
+// #cs-widget-chart {
+//   @import '../../../node_modules/bootstrap/scss/bootstrap.scss';
+// }
+
+.modal-auto-cs {
+  max-width: 100%;
+  width: 100%;
+  .modal-content {
+    height: 100vh;
+  }
+  .yAxis {
+    list-style: none;
+    li:after {
+      content: '';
+      width: 1rem;
+      display: block;
+      border-bottom: solid 1px #dee2e6;
+    }
+  }
+
+  .graph-bar {
+    .bar {
+      &.People {
+        background-color: #db356a;
+      }
+      &.Process {
+        background-color: #26a3dc;
+      }
+      &.Technology {
+        background-color: #9cc454;
+      }
+      &.Information {
+        background-color: #e38a3c;
+      }
+    }
+  }
+
+  .button-getintouch {
+    background-color: #3067db;
+    border-color: #3067db;
+    color: #fff;
+    border-radius: 30px !important;
+  }
+}
+
+.cs-popover {
+  max-width: 60vw;
+  font-size: 0.85rem;
+}
+
+@include media-breakpoint-up(md) {
+  .modal-auto-cs {
+    width: 90vw;
+    .modal-content {
+      height: 90vh;
+    }
+    small {
+      font-size: 0.8rem;
+    }
+  }
+  .cs-popover {
+    max-width: 50vw;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .modal-auto-cs {
+    width: 80vw;
+    .modal-content {
+      height: 80vh;
+    }
+    small {
+      font-size: 1rem;
+    }
+  }
+  .cs-popover {
+    max-width: 40vw;
+  }
+}
