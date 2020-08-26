@@ -1,17 +1,28 @@
 {
-  "name": "cs-chart",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@greenjimmy/cs-chart",
+  "version": "0.0.1",
+  "description": "Form questions with charted results",
   "main": "index.js",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "start": "webpack-dev-server --env.ENVIRONMENT=development --config webpack.config.js",
     "build:prod": "webpack --env.ENVIRONMENT=production --config webpack.config.js",
     "build:dev": "webpack --env.ENVIRONMENT=development --config webpack.config.js",
     "pretty": "prettier --write ./src/**/*.js",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src",
+    "package": "npm run pretty && npm run lint && npm run build:prod && npm publish"
   },
-  "author": "JT",
-  "license": "ISC",
+  "author": "JT <j.thompson@mac.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/greenjimmy/cs-chart.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "dependencies": {
     "bootstrap": "^4.5.2",
     "core-js": "^3.6.5",
