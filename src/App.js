@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Container,
   Row,
   Col,
   Tab,
@@ -64,7 +63,7 @@ const makeViewQuestions = (Data) => {
 };
 
 function App() {
-  const [showChart, setShowChart] = useState(true);
+  const [showChart, setShowChart] = useState(false);
   const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
   const [scores, setScores] = useState({});
   const [viewQuestion, setViewQuestion] = useState(makeViewQuestions(FormData));
@@ -210,7 +209,7 @@ function App() {
 
   return (
     <>
-      <Container ref={ref} id="cs-widget-chart">
+      <div ref={ref} id="cs-widget-chart">
         {!showChart ? (
           <Row>
             <Col>
@@ -437,7 +436,7 @@ function App() {
                     )}`;
                   }}
                 >
-                  Get in Touch
+                  Get Results
                 </Button>
                 <Button
                   size="lg"
@@ -552,7 +551,7 @@ function App() {
             </Row>
           </div>
         )}
-      </Container>
+      </div>
     </>
   );
 }

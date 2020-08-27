@@ -1,6 +1,6 @@
 {
   "name": "@greenjimmy/cs-chart",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Form questions with charted results",
   "main": "/lib/index.js",
   "files": [
