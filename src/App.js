@@ -9,8 +9,6 @@ import {
   Card,
   ListGroup,
   Button,
-  Popover,
-  OverlayTrigger,
 } from 'react-bootstrap';
 import { BsCheck, BsCheckBox, BsSquare } from 'react-icons/bs';
 import queryString from 'query-string';
@@ -41,15 +39,6 @@ const getScoreLabel = (score) =>
     ? 'Basic'
     : 'Adhoc';
 
-const popover = ({ area, label }) => (
-  <Popover id={`popover-${area}-${label}`} className="cs-popover">
-    <Popover.Title as="h3">
-      <strong>{area}:</strong> {label}
-    </Popover.Title>
-    <Popover.Content>{ResultsData[area][label]}</Popover.Content>
-  </Popover>
-);
-
 const makeAnswers = (Data) => {
   const results = {};
   Object.keys(Data).map((area) => {
@@ -75,12 +64,27 @@ const makeViewQuestions = (Data) => {
 };
 
 function App() {
-  const [showChart, setShowChart] = useState(false);
+  const [showChart, setShowChart] = useState(true);
   const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
   const [scores, setScores] = useState({});
   const [viewQuestion, setViewQuestion] = useState(makeViewQuestions(FormData));
   const [viewArea, setViewArea] = useState(Object.keys(FormData)[0]);
+  const [viewResult, setViewResult] = useState();
   const ref = useRef(null);
+
+  const turnOffResult = () => {
+    if (viewResult) {
+      setViewResult(null);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('click', turnOffResult);
+
+    return function cleanup() {
+      window.removeEventListener('click', turnOffResult);
+    };
+  });
 
   const setViewingQuestion = (area, index) => {
     const newViewQuestion = { ...viewQuestion };
@@ -130,6 +134,19 @@ function App() {
         allAreas[goToArea],
         areaUnanswered(allAreas[goToArea])
       );
+      setTimeout(() => {
+        const showQuestion = document.getElementById(
+          `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
+        );
+
+        if (showQuestion) {
+          document
+            .getElementById(
+              `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
+            )
+            .scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
     } else {
       setShowChart(true);
     }
@@ -193,7 +210,7 @@ function App() {
 
   return (
     <>
-      <Container className="px-0 my-5" ref={ref} id="cs-widget-chart">
+      <Container ref={ref} id="cs-widget-chart">
         {!showChart ? (
           <Row>
             <Col>
@@ -261,7 +278,7 @@ function App() {
                       ))}
                     </Row>
                     <Tab.Content className="text-left">
-                      {Object.keys(FormData).map((area) => (
+                      {Object.keys(FormData).map((area, areaIndex) => (
                         <Tab.Pane
                           eventKey={area}
                           key={`tabpane:${area}`}
@@ -276,6 +293,7 @@ function App() {
                                   key={`question:${area}:${questionsIndex.toString()}`}
                                 >
                                   <Accordion.Toggle
+                                    id={`question:${areaIndex}:${questionsIndex}`}
                                     as={Card.Header}
                                     eventKey={`question:${area}:${questionsIndex.toString()}`}
                                     className={`d-flex align-items-center${
@@ -309,7 +327,7 @@ function App() {
                                   <Accordion.Collapse
                                     eventKey={`question:${area}:${questionsIndex.toString()}`}
                                   >
-                                    <Card.Body>
+                                    <Card.Body className="pl-5">
                                       <ListGroup variant="flush">
                                         {question.answers.map(
                                           (answer, answersIndex) => (
@@ -367,17 +385,48 @@ function App() {
             </Col>
           </Row>
         ) : (
-          <>
+          <div className="graph-wrapper">
+            {viewResult ? (
+              <div className="area-info d-flex align-items-center">
+                <Row className="justify-content-center">
+                  <Col md="10" lg="8" xl="6">
+                    <div
+                      className={`result-content border shadow ${viewResult}`}
+                    >
+                      <div>
+                        <h3>
+                          <strong>{viewResult}:</strong>{' '}
+                          {getScoreLabel(scores[viewResult])}
+                        </h3>
+                        <button
+                          type="button"
+                          className="close"
+                          onClick={() => setViewResult(null)}
+                        >
+                          <span aria-hidden="true">×</span>
+                          <span className="sr-only">Close</span>
+                        </button>
+                      </div>
+                      {
+                        ResultsData[viewResult][
+                          getScoreLabel(scores[viewResult])
+                        ]
+                      }
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            ) : null}
+
             <Row className="flex-shrink-1">
-              <Col className="text-center mb-5">
+              <Col className="text-center">
                 <h2>The results are in!</h2>
                 <p>
-                  Hover over each category to see how you scored. Ready to
-                  improve?
+                  Click each category to see how you scored. Ready to improve?
                 </p>
                 <Button
                   size="lg"
-                  className="button-getintouch mr-5"
+                  className="button-getintouch mx-2 mb-3"
                   onClick={() => {
                     window.location.href = `/contact?formAnswers=${encodeURIComponent(
                       `${window.location.protocol}//${window.location.host}${
@@ -392,7 +441,7 @@ function App() {
                 </Button>
                 <Button
                   size="lg"
-                  className="button-getintouch-outline"
+                  className="button-getintouch-outline mx-2 mb-3"
                   onClick={() => setShowChart(false)}
                 >
                   Change my Answers
@@ -400,7 +449,7 @@ function App() {
               </Col>
             </Row>
             <Row className="flex-grow-1" style={{ minHeight: '500px' }}>
-              <Col md="3" lg="2" className="d-md-flex pr-0 d-none">
+              <Col md="3" lg="2" className="d-md-flex pr-0 d-none border-right">
                 <Row className="flex-grow-1">
                   <Col className="d-flex flex-column">
                     <ul className="yAxis p-0 m-0 d-flex flex-column flex-grow-1 align-items-stretch">
@@ -432,59 +481,55 @@ function App() {
                   </Col>
                 </Row>
               </Col>
-              <Col md="9" lg="10" className="graph d-flex flex-column pl-0">
-                <Row
-                  className="border-bottom border-left flex-grow-1"
-                  noGutters
-                >
+              <Col
+                md="9"
+                lg="10"
+                className="graph d-flex flex-column pl-0 pr-0 pr-md-3"
+              >
+                <Row className="border-bottom flex-grow-1" noGutters>
                   {Object.keys(FormData).map((area) => (
                     <Col
                       key={`bar:${area}`}
-                      className="graph-bar text-center align-items-end d-flex px-2"
+                      className="graph-bar text-center align-items-end d-flex"
                     >
-                      <OverlayTrigger
-                        container={ref.current}
-                        placement="auto"
-                        overlay={popover({
-                          area,
-                          label: getScoreLabel(scores[area]),
-                        })}
+                      <div
+                        role="button"
+                        tabIndex="0"
+                        onClick={() => setViewResult(area)}
+                        onKeyPress={() => setViewResult(area)}
+                        className={`w-100 bar ${area} text-center text-white`}
+                        style={{ height: `${scores[area]}%` }}
                       >
-                        <div
-                          className={`w-100 bar ${area} text-center text-white p-3`}
-                          style={{ height: `${scores[area]}%` }}
-                        >
-                          <small className="d-block">
-                            <strong>{getScoreLabel(scores[area])}</strong>
-                          </small>
-                          <div className="d-md-none">
-                            {getScoreLabel(scores[area]) === 'Optimized' ? (
-                              <small>
-                                Highly Efficient, Digital, Agile, Integrated
-                                &amp; Continual
-                              </small>
-                            ) : null}
-                            {getScoreLabel(scores[area]) === 'Managed' ? (
-                              <small>
-                                Effective, Accurate, Centralized, Adjustable
-                                &amp; Periodic
-                              </small>
-                            ) : null}
-                            {getScoreLabel(scores[area]) === 'Basic' ? (
-                              <small>
-                                Manual, Burdensome, Occasional, Isolated &amp;
-                                Document Centric
-                              </small>
-                            ) : null}
-                            {getScoreLabel(scores[area]) === 'Adhoc' ? (
-                              <small>
-                                Inefficient, Fragmented, Isolated, Inflexible
-                                &amp; Chaotic
-                              </small>
-                            ) : null}
-                          </div>
+                        <small className="d-block">
+                          <strong>{getScoreLabel(scores[area])}</strong>
+                        </small>
+                        <div className="d-md-none">
+                          {getScoreLabel(scores[area]) === 'Optimized' ? (
+                            <small>
+                              Highly Efficient, Digital, Agile, Integrated &amp;
+                              Continual
+                            </small>
+                          ) : null}
+                          {getScoreLabel(scores[area]) === 'Managed' ? (
+                            <small>
+                              Effective, Accurate, Centralized, Adjustable &amp;
+                              Periodic
+                            </small>
+                          ) : null}
+                          {getScoreLabel(scores[area]) === 'Basic' ? (
+                            <small>
+                              Manual, Burdensome, Occasional, Isolated &amp;
+                              Document Centric
+                            </small>
+                          ) : null}
+                          {getScoreLabel(scores[area]) === 'Adhoc' ? (
+                            <small>
+                              Inefficient, Fragmented, Isolated, Inflexible
+                              &amp; Chaotic
+                            </small>
+                          ) : null}
                         </div>
-                      </OverlayTrigger>
+                      </div>
                     </Col>
                   ))}
                 </Row>
@@ -492,20 +537,20 @@ function App() {
             </Row>
             <Row className="flex-shrink-1">
               <Col md="3" lg="2" className="d-block d-md-flex" />
-              <Col md="9" lg="10" className="graph pl-0">
-                <Row>
+              <Col md="9" lg="10" className="graph pl-0  pr-0 pr-md-3">
+                <Row noGutters>
                   {Object.keys(FormData).map((area) => (
                     <Col
                       key={`bar:${area}`}
-                      className="graph-bar bar-title text-center mt-2"
+                      className="graph-bar bar-title text-center mt-2 pr-0"
                     >
-                      {area}
+                      <small>{area}</small>
                     </Col>
                   ))}
                 </Row>
               </Col>
             </Row>
-          </>
+          </div>
         )}
       </Container>
     </>

@@ -6,7 +6,7 @@ import App from './App';
 
 ReactDOM.render(
   <BrowserRouter>
-    <Container fluid className="d-flex flex-column flex-grow-1">
+    <Container fluid>
       <App />
     </Container>
   </BrowserRouter>,
