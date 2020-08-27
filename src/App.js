@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Container,
   Row,
@@ -9,11 +9,9 @@ import {
   Card,
   ListGroup,
   Button,
-  Modal,
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';
-import styled from 'styled-components';
 import { BsCheck, BsCheckBox, BsSquare } from 'react-icons/bs';
 import queryString from 'query-string';
 
@@ -33,194 +31,6 @@ if (parseQS['CS-ANSWERS']) {
 if (parseQS['CS-AUTO-ANSWERS']) {
   csAutoAnswer = true;
 }
-
-const StyledModal = styled(Modal)`
-  display: flex !important;
-  .modal-dialog {
-    align-items: center;
-    display: flex;
-  }
-  .modal-header {
-    border: none;
-  }
-`;
-const StyledContainer = styled(Container)`
-  .nav-link {
-    cursor: pointer;
-    margin-bottom: 0.5rem;
-    border: solid 2px #fff;
-    &.People {
-      color: #db356a;
-      &:hover,
-      &.active {
-        border-color: #db356a;
-      }
-      &.active {
-        background-color: #db356a;
-      }
-    }
-    &.Process {
-      color: #26a2dc;
-      &:hover,
-      &.active {
-        border-color: #26a2dc;
-      }
-      &.active {
-        background-color: #26a2dc;
-      }
-    }
-    &.Technology {
-      color: #9dc555;
-      &:hover,
-      &.active {
-        border-color: #9dc555;
-      }
-      &.active {
-        background-color: #9dc555;
-      }
-    }
-    &.Information {
-      color: #f36c21;
-      &:hover,
-      &.active {
-        border-color: #f36c21;
-      }
-      &.active {
-        background-color: #f36c21;
-      }
-    }
-    &.active {
-      color: #ffffff !important;
-    }
-    &:focus {
-      outline: none;
-    }
-  }
-
-  .card-header {
-    cursor: pointer;
-  }
-
-  .tab-pane {
-    .list-group-item {
-      cursor: pointer;
-    }
-    &.People {
-      .list-group-item.selected,
-      .list-group-item:hover,
-      .checkbox,
-      .card-header:hover {
-        color: #db356a;
-      }
-      .selected.card-header,
-      .selected.card-header:hover {
-        background-color: #db356a;
-        color: #ffffff;
-        .checkbox {
-          color: #ffffff !important;
-        }
-      }
-    }
-    &.Process {
-      .list-group-item.selected,
-      .list-group-item:hover,
-      .checkbox,
-      .card-header:hover {
-        color: #26a2dc;
-      }
-      .selected.card-header,
-      .selected.card-header:hover {
-        background-color: #26a2dc;
-        color: #ffffff;
-        .checkbox {
-          color: #ffffff !important;
-        }
-      }
-    }
-    &.Technology {
-      .list-group-item.selected,
-      .list-group-item:hover,
-      .checkbox,
-      .card-header:hover {
-        color: #9dc555;
-      }
-      .selected.card-header,
-      .selected.card-header:hover {
-        background-color: #9dc555;
-        color: #ffffff;
-        .checkbox {
-          color: #ffffff !important;
-        }
-      }
-    }
-    &.Information {
-      .list-group-item.selected,
-      .list-group-item:hover,
-      .checkbox,
-      .card-header:hover {
-        color: #f36c21;
-      }
-      .selected.card-header,
-      .selected.card-header:hover {
-        background-color: #f36c21;
-        color: #ffffff;
-        .checkbox {
-          color: #ffffff !important;
-        }
-      }
-    }
-  }
-
-  .button-results {
-    background-color: #3067db;
-    border-color: #3067db;
-    color: #fff;
-    border-radius: 30px !important;
-  }
-
-  .survery-top-nav {
-    .btn-link {
-      display: block;
-      text-align: center;
-      padding: 0.5rem;
-      width: 100%;
-      margin-bottom: 1rem;
-      &:hover,
-      &.active {
-        color: #fff;
-        text-decoration: none !important;
-      }
-      &.People {
-        color: #db356a;
-        &.active {
-          background-color: #db356a;
-          color: #fff;
-        }
-      }
-      &.Process {
-        color: #26a2dc;
-        &.active {
-          background-color: #26a2dc;
-          color: #fff;
-        }
-      }
-      &.Technology {
-        color: #9dc555;
-        &.active {
-          background-color: #9dc555;
-          color: #fff;
-        }
-      }
-      &.Information {
-        color: #f36c21;
-        &.active {
-          background-color: #f36c21;
-          color: #fff;
-        }
-      }
-    }
-  }
-`;
 
 const getScoreLabel = (score) =>
   score >= 75
@@ -264,12 +74,13 @@ const makeViewQuestions = (Data) => {
   return results;
 };
 
-function Home() {
+function App() {
   const [showChart, setShowChart] = useState(false);
   const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
   const [scores, setScores] = useState({});
   const [viewQuestion, setViewQuestion] = useState(makeViewQuestions(FormData));
   const [viewArea, setViewArea] = useState(Object.keys(FormData)[0]);
+  const ref = useRef(null);
 
   const setViewingQuestion = (area, index) => {
     const newViewQuestion = { ...viewQuestion };
@@ -382,306 +193,300 @@ function Home() {
 
   return (
     <>
-      <StyledContainer className="px-0">
-        <Row>
-          <Col>
-            <Tab.Container activeKey={viewArea}>
-              <Row>
-                <Col md={3} className="d-none d-md-block">
-                  <Nav variant="pills" className="flex-column">
-                    {Object.keys(FormData).map((area) => (
-                      <Nav.Item key={`tab:${area}`}>
-                        <Nav.Link
-                          eventKey={area}
-                          className={`${area} d-flex align-items-center`}
-                          onClick={() => setViewArea(area)}
-                        >
-                          {area}
-                          <BsCheck
-                            size="2rem"
-                            className={`ml-auto${
-                              !areaComplete(area) ? ' invisible' : ''
-                            }`}
-                          />
-                        </Nav.Link>
-                      </Nav.Item>
-                    ))}
-                  </Nav>
-                  {canViewChart() ? (
-                    <Button
-                      size="lg"
-                      className="my-5 button-results"
-                      block
-                      onClick={() => setShowChart(true)}
-                      variant="custom"
-                    >
-                      VIEW RESULTS
-                    </Button>
-                  ) : null}
-                </Col>
-                <Col md={9}>
-                  <Row
-                    noGutters
-                    className="d-flex d-md-none survery-top-nav"
-                    xs="2"
-                    sm="4"
-                  >
-                    {Object.keys(FormData).map((area) => (
-                      <Col key={`topnav:${area}`}>
-                        <Button
-                          variant="link"
-                          className={`${area} ${
-                            area === viewArea ? 'active' : ''
-                          } d-flex align-items-center justify-content-center`}
-                          onClick={() => setViewArea(area)}
-                        >
-                          {area}
-                          {areaComplete(area) ? (
-                            <BsCheck className="ml-2" size="1.5rem" />
-                          ) : null}
-                        </Button>
-                      </Col>
-                    ))}
-                  </Row>
-                  <Tab.Content>
-                    {Object.keys(FormData).map((area) => (
-                      <Tab.Pane
-                        eventKey={area}
-                        key={`tabpane:${area}`}
-                        className={area}
+      <Container className="px-0" ref={ref} id="cs-widget-chart">
+        {!showChart ? (
+          <Row>
+            <Col>
+              <Tab.Container activeKey={viewArea}>
+                <Row>
+                  <Col md={3} className="d-none d-md-block">
+                    <Nav variant="pills" className="flex-column">
+                      {Object.keys(FormData).map((area) => (
+                        <Nav.Item key={`tab:${area}`}>
+                          <Nav.Link
+                            eventKey={area}
+                            className={`${area} d-flex align-items-center`}
+                            onClick={() => setViewArea(area)}
+                          >
+                            {area}
+                            <BsCheck
+                              size="2rem"
+                              className={`ml-auto${
+                                !areaComplete(area) ? ' invisible' : ''
+                              }`}
+                            />
+                          </Nav.Link>
+                        </Nav.Item>
+                      ))}
+                    </Nav>
+                    {canViewChart() ? (
+                      <Button
+                        size="lg"
+                        className="my-5 button-results"
+                        block
+                        onClick={() => setShowChart(true)}
+                        variant="custom"
                       >
-                        <Accordion
-                          activeKey={`question:${area}:${viewQuestion[area]}`}
+                        VIEW RESULTS
+                      </Button>
+                    ) : null}
+                  </Col>
+                  <Col md={9}>
+                    <Row
+                      noGutters
+                      className="d-flex d-md-none survery-top-nav"
+                      xs="2"
+                      sm="4"
+                    >
+                      {Object.keys(FormData).map((area) => (
+                        <Col key={`topnav:${area}`}>
+                          <Button
+                            variant="link"
+                            className={`${area} ${
+                              area === viewArea ? 'active' : ''
+                            } d-flex align-items-center justify-content-center`}
+                            onClick={() => setViewArea(area)}
+                          >
+                            {area}
+                            {areaComplete(area) ? (
+                              <BsCheck className="ml-2" size="1.5rem" />
+                            ) : null}
+                          </Button>
+                        </Col>
+                      ))}
+                    </Row>
+                    <Tab.Content>
+                      {Object.keys(FormData).map((area) => (
+                        <Tab.Pane
+                          eventKey={area}
+                          key={`tabpane:${area}`}
+                          className={area}
                         >
-                          {FormData[area].questions.map(
-                            (question, questionsIndex) => (
-                              <Card
-                                key={`question:${area}:${questionsIndex.toString()}`}
-                              >
-                                <Accordion.Toggle
-                                  as={Card.Header}
-                                  eventKey={`question:${area}:${questionsIndex.toString()}`}
-                                  className={`d-flex align-items-center${
-                                    viewQuestion[area] === questionsIndex
-                                      ? ' selected'
-                                      : ''
-                                  }`}
-                                  onClick={() => {
-                                    setViewingQuestion(area, questionsIndex);
-                                  }}
+                          <Accordion
+                            activeKey={`question:${area}:${viewQuestion[area]}`}
+                          >
+                            {FormData[area].questions.map(
+                              (question, questionsIndex) => (
+                                <Card
+                                  key={`question:${area}:${questionsIndex.toString()}`}
                                 >
-                                  <div className="d-inline-flex">
-                                    {answers[area][questionsIndex] > 0 ? (
-                                      <BsCheckBox
-                                        className="mr-3 checkbox"
-                                        size="2rem"
-                                      />
-                                    ) : (
-                                      <BsSquare
-                                        size="1.65rem"
-                                        style={{
-                                          margin: '0 1.15rem 0 .2rem',
-                                        }}
-                                      />
-                                    )}
-                                  </div>
-                                  <div className="d-inline-flex">
-                                    {question.question}
-                                  </div>
-                                </Accordion.Toggle>
-                                <Accordion.Collapse
-                                  eventKey={`question:${area}:${questionsIndex.toString()}`}
-                                >
-                                  <Card.Body>
-                                    <ListGroup variant="flush">
-                                      {question.answers.map(
-                                        (answer, answersIndex) => (
-                                          <ListGroup.Item
-                                            key={`answer:${area}:${questionsIndex.toString()}:${answersIndex.toString()}`}
-                                            className={
-                                              answers[area][questionsIndex] ===
-                                              4 - answersIndex
-                                                ? 'selected'
-                                                : ''
-                                            }
-                                            onClick={() =>
-                                              answered(
-                                                area,
-                                                questionsIndex,
-                                                4 - answersIndex
-                                              )
-                                            }
-                                          >
-                                            {answer}
-                                          </ListGroup.Item>
-                                        )
+                                  <Accordion.Toggle
+                                    as={Card.Header}
+                                    eventKey={`question:${area}:${questionsIndex.toString()}`}
+                                    className={`d-flex align-items-center${
+                                      viewQuestion[area] === questionsIndex
+                                        ? ' selected'
+                                        : ''
+                                    }`}
+                                    onClick={() => {
+                                      setViewingQuestion(area, questionsIndex);
+                                    }}
+                                  >
+                                    <div className="d-inline-flex">
+                                      {answers[area][questionsIndex] > 0 ? (
+                                        <BsCheckBox
+                                          className="mr-3 checkbox"
+                                          size="2rem"
+                                        />
+                                      ) : (
+                                        <BsSquare
+                                          size="1.65rem"
+                                          style={{
+                                            margin: '0 1.15rem 0 .2rem',
+                                          }}
+                                        />
                                       )}
-                                    </ListGroup>
-                                  </Card.Body>
-                                </Accordion.Collapse>
-                              </Card>
-                            )
-                          )}
-                        </Accordion>
-                      </Tab.Pane>
-                    ))}
-                  </Tab.Content>
-                </Col>
-              </Row>
-            </Tab.Container>
-            <Button
-              disabled={!canViewChart()}
-              size="lg"
-              className="d-block d-md-none my-5 button-results"
-              block
-              onClick={() => setShowChart(true)}
-              variant="custom"
-            >
-              VIEW RESULTS
-            </Button>
-          </Col>
-        </Row>
-      </StyledContainer>
-      <StyledModal
-        size="auto-cs"
-        show={showChart}
-        onHide={() => setShowChart(false)}
-      >
-        <Modal.Header closeButton style={{ zIndex: 2 }} />
-        <Modal.Body className="d-flex flex-column position-absolute w-100 h-100">
-          <Row className="flex-shrink-1">
-            <Col className="text-center mb-5">
-              <h2>The results are in!</h2>
-              <p>
-                Hover over each category to see how you scored. Ready to
-                improve?
-              </p>
+                                    </div>
+                                    <div className="d-inline-flex">
+                                      {question.question}
+                                    </div>
+                                  </Accordion.Toggle>
+                                  <Accordion.Collapse
+                                    eventKey={`question:${area}:${questionsIndex.toString()}`}
+                                  >
+                                    <Card.Body>
+                                      <ListGroup variant="flush">
+                                        {question.answers.map(
+                                          (answer, answersIndex) => (
+                                            <ListGroup.Item
+                                              key={`answer:${area}:${questionsIndex.toString()}:${answersIndex.toString()}`}
+                                              className={
+                                                answers[area][
+                                                  questionsIndex
+                                                ] ===
+                                                4 - answersIndex
+                                                  ? 'selected'
+                                                  : ''
+                                              }
+                                              onClick={() =>
+                                                answered(
+                                                  area,
+                                                  questionsIndex,
+                                                  4 - answersIndex
+                                                )
+                                              }
+                                            >
+                                              {answer}
+                                            </ListGroup.Item>
+                                          )
+                                        )}
+                                      </ListGroup>
+                                    </Card.Body>
+                                  </Accordion.Collapse>
+                                </Card>
+                              )
+                            )}
+                          </Accordion>
+                        </Tab.Pane>
+                      ))}
+                    </Tab.Content>
+                  </Col>
+                </Row>
+              </Tab.Container>
               <Button
+                disabled={!canViewChart()}
                 size="lg"
-                className="button-getintouch"
-                onClick={() => {
-                  window.location.href = `/contact?formAnswers=${encodeURIComponent(
-                    JSON.stringify(answers)
-                  )}`;
-                }}
+                className="d-block d-md-none my-5 button-results"
+                block
+                onClick={() => setShowChart(true)}
+                variant="custom"
               >
-                Get in Touch
+                VIEW RESULTS
               </Button>
             </Col>
           </Row>
-          <Row className="flex-grow-1">
-            <Col md="3" lg="2" className="d-md-flex pr-0 d-none">
-              <Row className="flex-grow-1">
-                <Col className="d-flex flex-column">
-                  <ul className="yAxis p-0 m-0 d-flex flex-column flex-grow-1 align-items-stretch">
-                    <li className="d-flex flex-grow-1 align-items-center">
-                      <small className="text-right pr-3">
-                        Highly Efficient, Digital, Agile, Integrated &amp;
-                        Continual
-                      </small>
-                    </li>
-                    <li className="d-flex flex-grow-1 align-items-center">
-                      <small className="text-right pr-3">
-                        Effective, Accurate, Centralized, Adjustable &amp;
-                        Periodic
-                      </small>
-                    </li>
-                    <li className="d-flex flex-grow-1 align-items-center">
-                      <small className="text-right pr-3">
-                        Manual, Burdensome, Occasional, Isolated &amp; Document
-                        Centric
-                      </small>
-                    </li>
-                    <li className="d-flex flex-grow-1 align-items-center">
-                      <small className="text-right pr-3">
-                        Inefficient, Fragmented, Isolated, Inflexible &amp;
-                        Chaotic
-                      </small>
-                    </li>
-                  </ul>
-                </Col>
-              </Row>
-            </Col>
-            <Col md="9" lg="10" className="graph d-flex flex-column pl-0">
-              <Row className="border-bottom border-left flex-grow-1" noGutters>
-                {Object.keys(FormData).map((area) => (
-                  <Col
-                    key={`bar:${area}`}
-                    className="graph-bar text-center align-items-end d-flex px-2"
-                  >
-                    <OverlayTrigger
-                      placement="auto-end"
-                      overlay={popover({
-                        area,
-                        label: getScoreLabel(scores[area]),
-                      })}
-                    >
-                      <div
-                        className={`w-100 bar ${area} text-center text-white p-3`}
-                        style={{ height: `${scores[area]}%` }}
-                      >
-                        <small className="d-block">
-                          <strong>{getScoreLabel(scores[area])}</strong>
+        ) : (
+          <>
+            <Row className="flex-shrink-1">
+              <Col className="text-center mb-5">
+                <h2>The results are in!</h2>
+                <p>
+                  Hover over each category to see how you scored. Ready to
+                  improve?
+                </p>
+                <Button
+                  size="lg"
+                  className="button-getintouch"
+                  onClick={() => {
+                    window.location.href = `/contact?formAnswers=${encodeURIComponent(
+                      JSON.stringify(answers)
+                    )}`;
+                  }}
+                >
+                  Get in Touch
+                </Button>
+              </Col>
+            </Row>
+            <Row className="flex-grow-1" style={{ minHeight: '500px' }}>
+              <Col md="3" lg="2" className="d-md-flex pr-0 d-none">
+                <Row className="flex-grow-1">
+                  <Col className="d-flex flex-column">
+                    <ul className="yAxis p-0 m-0 d-flex flex-column flex-grow-1 align-items-stretch">
+                      <li className="d-flex flex-grow-1 align-items-center">
+                        <small className="text-right pr-3">
+                          Highly Efficient, Digital, Agile, Integrated &amp;
+                          Continual
                         </small>
-                        <div className="d-md-none">
-                          {getScoreLabel(scores[area]) === 'Optimized' ? (
-                            <small>
-                              Highly Efficient, Digital, Agile, Integrated &amp;
-                              Continual
-                            </small>
-                          ) : null}
-                          {getScoreLabel(scores[area]) === 'Managed' ? (
-                            <small>
-                              Effective, Accurate, Centralized, Adjustable &amp;
-                              Periodic
-                            </small>
-                          ) : null}
-                          {getScoreLabel(scores[area]) === 'Basic' ? (
-                            <small>
-                              Manual, Burdensome, Occasional, Isolated &amp;
-                              Document Centric
-                            </small>
-                          ) : null}
-                          {getScoreLabel(scores[area]) === 'Adhoc' ? (
-                            <small>
-                              Inefficient, Fragmented, Isolated, Inflexible
-                              &amp; Chaotic
-                            </small>
-                          ) : null}
+                      </li>
+                      <li className="d-flex flex-grow-1 align-items-center">
+                        <small className="text-right pr-3">
+                          Effective, Accurate, Centralized, Adjustable &amp;
+                          Periodic
+                        </small>
+                      </li>
+                      <li className="d-flex flex-grow-1 align-items-center">
+                        <small className="text-right pr-3">
+                          Manual, Burdensome, Occasional, Isolated &amp;
+                          Document Centric
+                        </small>
+                      </li>
+                      <li className="d-flex flex-grow-1 align-items-center">
+                        <small className="text-right pr-3">
+                          Inefficient, Fragmented, Isolated, Inflexible &amp;
+                          Chaotic
+                        </small>
+                      </li>
+                    </ul>
+                  </Col>
+                </Row>
+              </Col>
+              <Col md="9" lg="10" className="graph d-flex flex-column pl-0">
+                <Row
+                  className="border-bottom border-left flex-grow-1"
+                  noGutters
+                >
+                  {Object.keys(FormData).map((area) => (
+                    <Col
+                      key={`bar:${area}`}
+                      className="graph-bar text-center align-items-end d-flex px-2"
+                    >
+                      <OverlayTrigger
+                        container={ref.current}
+                        placement="auto"
+                        overlay={popover({
+                          area,
+                          label: getScoreLabel(scores[area]),
+                        })}
+                      >
+                        <div
+                          className={`w-100 bar ${area} text-center text-white p-3`}
+                          style={{ height: `${scores[area]}%` }}
+                        >
+                          <small className="d-block">
+                            <strong>{getScoreLabel(scores[area])}</strong>
+                          </small>
+                          <div className="d-md-none">
+                            {getScoreLabel(scores[area]) === 'Optimized' ? (
+                              <small>
+                                Highly Efficient, Digital, Agile, Integrated
+                                &amp; Continual
+                              </small>
+                            ) : null}
+                            {getScoreLabel(scores[area]) === 'Managed' ? (
+                              <small>
+                                Effective, Accurate, Centralized, Adjustable
+                                &amp; Periodic
+                              </small>
+                            ) : null}
+                            {getScoreLabel(scores[area]) === 'Basic' ? (
+                              <small>
+                                Manual, Burdensome, Occasional, Isolated &amp;
+                                Document Centric
+                              </small>
+                            ) : null}
+                            {getScoreLabel(scores[area]) === 'Adhoc' ? (
+                              <small>
+                                Inefficient, Fragmented, Isolated, Inflexible
+                                &amp; Chaotic
+                              </small>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
-                    </OverlayTrigger>
-                  </Col>
-                ))}
-              </Row>
-            </Col>
-          </Row>
-          <Row className="flex-shrink-1">
-            <Col md="3" lg="2" className="d-block d-md-flex" />
-            <Col md="9" lg="10" className="graph pl-0">
-              <Row>
-                {Object.keys(FormData).map((area) => (
-                  <Col
-                    key={`bar:${area}`}
-                    className="graph-bar bar-title text-center mt-2"
-                  >
-                    {area}
-                  </Col>
-                ))}
-              </Row>
-            </Col>
-          </Row>
-        </Modal.Body>
-      </StyledModal>
+                      </OverlayTrigger>
+                    </Col>
+                  ))}
+                </Row>
+              </Col>
+            </Row>
+            <Row className="flex-shrink-1">
+              <Col md="3" lg="2" className="d-block d-md-flex" />
+              <Col md="9" lg="10" className="graph pl-0">
+                <Row>
+                  {Object.keys(FormData).map((area) => (
+                    <Col
+                      key={`bar:${area}`}
+                      className="graph-bar bar-title text-center mt-2"
+                    >
+                      {area}
+                    </Col>
+                  ))}
+                </Row>
+              </Col>
+            </Row>
+          </>
+        )}
+      </Container>
     </>
-  );
-}
-
-function App() {
-  return (
-    <Container fluid className="d-flex flex-column flex-grow-1">
-      <Home />
-    </Container>
   );
 }
 

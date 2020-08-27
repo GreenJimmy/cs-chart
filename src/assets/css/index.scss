@@ -1,17 +1,181 @@
-// @import 'https://capabilitysource.com/static/css/Home.d883f6a4.chunk.css';
-// @import 'https://capabilitysource.com/static/css/Home.d883f6a4.chunk.css';
-@import '../../../node_modules/bootstrap/scss/bootstrap.scss';
-
-// #cs-widget-chart {
-//   @import '../../../node_modules/bootstrap/scss/bootstrap.scss';
-// }
-
-.modal-auto-cs {
-  max-width: 100%;
-  width: 100%;
-  .modal-content {
-    height: 100vh;
+#cs-widget-chart {
+  @import '../../../node_modules/bootstrap/scss/bootstrap.scss';
+  .nav-link {
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+    border: solid 2px #fff;
+    &.People {
+      color: #db356a;
+      &:hover,
+      &.active {
+        border-color: #db356a;
+      }
+      &.active {
+        background-color: #db356a;
+      }
+    }
+    &.Process {
+      color: #26a2dc;
+      &:hover,
+      &.active {
+        border-color: #26a2dc;
+      }
+      &.active {
+        background-color: #26a2dc;
+      }
+    }
+    &.Technology {
+      color: #9dc555;
+      &:hover,
+      &.active {
+        border-color: #9dc555;
+      }
+      &.active {
+        background-color: #9dc555;
+      }
+    }
+    &.Information {
+      color: #f36c21;
+      &:hover,
+      &.active {
+        border-color: #f36c21;
+      }
+      &.active {
+        background-color: #f36c21;
+      }
+    }
+    &.active {
+      color: #ffffff !important;
+    }
+    &:focus {
+      outline: none;
+    }
   }
+
+  .card-header {
+    cursor: pointer;
+  }
+
+  .tab-pane {
+    .list-group-item {
+      cursor: pointer;
+    }
+    &.People {
+      .list-group-item.selected,
+      .list-group-item:hover,
+      .checkbox,
+      .card-header:hover {
+        color: #db356a;
+      }
+      .selected.card-header,
+      .selected.card-header:hover {
+        background-color: #db356a;
+        color: #ffffff;
+        .checkbox {
+          color: #ffffff !important;
+        }
+      }
+    }
+    &.Process {
+      .list-group-item.selected,
+      .list-group-item:hover,
+      .checkbox,
+      .card-header:hover {
+        color: #26a2dc;
+      }
+      .selected.card-header,
+      .selected.card-header:hover {
+        background-color: #26a2dc;
+        color: #ffffff;
+        .checkbox {
+          color: #ffffff !important;
+        }
+      }
+    }
+    &.Technology {
+      .list-group-item.selected,
+      .list-group-item:hover,
+      .checkbox,
+      .card-header:hover {
+        color: #9dc555;
+      }
+      .selected.card-header,
+      .selected.card-header:hover {
+        background-color: #9dc555;
+        color: #ffffff;
+        .checkbox {
+          color: #ffffff !important;
+        }
+      }
+    }
+    &.Information {
+      .list-group-item.selected,
+      .list-group-item:hover,
+      .checkbox,
+      .card-header:hover {
+        color: #f36c21;
+      }
+      .selected.card-header,
+      .selected.card-header:hover {
+        background-color: #f36c21;
+        color: #ffffff;
+        .checkbox {
+          color: #ffffff !important;
+        }
+      }
+    }
+  }
+
+  .button-results {
+    background-color: #3067db;
+    border-color: #3067db;
+    color: #fff;
+    border-radius: 30px !important;
+  }
+
+  .survery-top-nav {
+    .btn-link {
+      display: block;
+      text-align: center;
+      padding: 0.5rem;
+      width: 100%;
+      margin-bottom: 1rem;
+      &:hover,
+      &.active {
+        color: #fff;
+        text-decoration: none !important;
+      }
+      &.People {
+        color: #db356a;
+        &.active {
+          background-color: #db356a;
+          color: #fff;
+        }
+      }
+      &.Process {
+        color: #26a2dc;
+        &.active {
+          background-color: #26a2dc;
+          color: #fff;
+        }
+      }
+      &.Technology {
+        color: #9dc555;
+        &.active {
+          background-color: #9dc555;
+          color: #fff;
+        }
+      }
+      &.Information {
+        color: #f36c21;
+        &.active {
+          background-color: #f36c21;
+          color: #fff;
+        }
+      }
+    }
+  }
+
   .yAxis {
     list-style: none;
     li:after {
@@ -45,39 +209,19 @@
     color: #fff;
     border-radius: 30px !important;
   }
-}
-
-.cs-popover {
-  max-width: 60vw;
-  font-size: 0.85rem;
-}
-
-@include media-breakpoint-up(md) {
-  .modal-auto-cs {
-    width: 90vw;
-    .modal-content {
-      height: 90vh;
-    }
-    small {
-      font-size: 0.8rem;
-    }
-  }
   .cs-popover {
-    max-width: 50vw;
+    max-width: 60vw;
+    font-size: 12px;
   }
-}
+  @include media-breakpoint-up(md) {
+    .cs-popover {
+      max-width: 50vw;
+    }
+  }
 
-@include media-breakpoint-up(lg) {
-  .modal-auto-cs {
-    width: 80vw;
-    .modal-content {
-      height: 80vh;
+  @include media-breakpoint-up(lg) {
+    .cs-popover {
+      max-width: 40vw;
     }
-    small {
-      font-size: 1rem;
-    }
-  }
-  .cs-popover {
-    max-width: 40vw;
   }
 }

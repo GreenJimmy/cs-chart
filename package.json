@@ -1,8 +1,8 @@
 {
   "name": "@greenjimmy/cs-chart",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "Form questions with charted results",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "files": [
     "dist/**/*"
   ],
@@ -10,9 +10,10 @@
     "start": "webpack-dev-server --env.ENVIRONMENT=development --config webpack.config.js",
     "build:prod": "webpack --env.ENVIRONMENT=production --config webpack.config.js",
     "build:dev": "webpack --env.ENVIRONMENT=development --config webpack.config.js",
+    "build:package": "webpack --env.ENVIRONMENT=production --config webpack.package.config.js",
     "pretty": "prettier --write ./src/**/*.js",
     "lint": "eslint ./src",
-    "package": "npm run pretty && npm run lint && npm run build:prod && npm publish"
+    "deploy": "npm run pretty && npm run lint && npm run build:package && npm publish"
   },
   "author": "JT <j.thompson@mac.com>",
   "license": "MIT",
@@ -22,6 +23,10 @@
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "dependencies": {
     "bootstrap": "^4.5.2",
