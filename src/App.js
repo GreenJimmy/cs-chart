@@ -193,7 +193,7 @@ function App() {
 
   return (
     <>
-      <Container className="px-0" ref={ref} id="cs-widget-chart">
+      <Container className="px-0 my-5" ref={ref} id="cs-widget-chart">
         {!showChart ? (
           <Row>
             <Col>
@@ -219,16 +219,21 @@ function App() {
                         </Nav.Item>
                       ))}
                     </Nav>
-                    {canViewChart() ? (
-                      <Button
-                        size="lg"
-                        className="my-5 button-results"
-                        block
-                        onClick={() => setShowChart(true)}
-                        variant="custom"
-                      >
-                        VIEW RESULTS
-                      </Button>
+                    <Button
+                      size="lg"
+                      className="mt-5 mb-3 button-results"
+                      block
+                      disabled={!canViewChart()}
+                      onClick={() => setShowChart(true)}
+                      variant="custom"
+                    >
+                      VIEW RESULTS
+                    </Button>
+                    {!canViewChart() ? (
+                      <small className="text-center d-block mx-3">
+                        Answer a minimum of 4 questions in each section to view
+                        results.
+                      </small>
                     ) : null}
                   </Col>
                   <Col md={9}>
@@ -255,7 +260,7 @@ function App() {
                         </Col>
                       ))}
                     </Row>
-                    <Tab.Content>
+                    <Tab.Content className="text-left">
                       {Object.keys(FormData).map((area) => (
                         <Tab.Pane
                           eventKey={area}
@@ -344,15 +349,21 @@ function App() {
                 </Row>
               </Tab.Container>
               <Button
-                disabled={!canViewChart()}
                 size="lg"
-                className="d-block d-md-none my-5 button-results"
+                className="mt-5 mb-3 button-results d-block d-md-none"
                 block
+                disabled={!canViewChart()}
                 onClick={() => setShowChart(true)}
                 variant="custom"
               >
                 VIEW RESULTS
               </Button>
+              {!canViewChart() ? (
+                <small className="text-center d-block d-md-none mx-3">
+                  Answer a minimum of 4 questions in each section to view
+                  results.
+                </small>
+              ) : null}
             </Col>
           </Row>
         ) : (
@@ -366,14 +377,25 @@ function App() {
                 </p>
                 <Button
                   size="lg"
-                  className="button-getintouch"
+                  className="button-getintouch mr-5"
                   onClick={() => {
                     window.location.href = `/contact?formAnswers=${encodeURIComponent(
-                      JSON.stringify(answers)
+                      `${window.location.protocol}//${window.location.host}${
+                        window.location.pathname
+                      }?CS-ANSWERS=${encodeURIComponent(
+                        JSON.stringify(answers)
+                      )}`
                     )}`;
                   }}
                 >
                   Get in Touch
+                </Button>
+                <Button
+                  size="lg"
+                  className="button-getintouch-outline"
+                  onClick={() => setShowChart(false)}
+                >
+                  Change my Answers
                 </Button>
               </Col>
             </Row>

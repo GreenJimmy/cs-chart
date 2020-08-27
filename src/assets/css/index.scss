@@ -131,6 +131,31 @@
     border-color: #3067db;
     color: #fff;
     border-radius: 30px !important;
+    &:hover {
+      color: #fff;
+    }
+    &[disabled] {
+      background-color: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.03);
+      color: #999;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-color: rgba(0, 0, 0, 0.1);
+        color: #999;
+      }
+    }
+  }
+
+  .button-getintouch-outline {
+    background-color: #fff;
+    border-color: #fff;
+    color: #999;
+    border-radius: 30px !important;
+    &:hover {
+      background-color: #fff;
+      border-color: #3067db;
+      color: #3067db;
+    }
   }
 
   .survery-top-nav {
