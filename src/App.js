@@ -207,6 +207,12 @@ function App() {
     setScores(newScores);
   }, [answers]);
 
+  useEffect(() => {
+    document
+      .getElementById('cs-widget-chart')
+      .scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [showChart]);
+
   return (
     <>
       <div ref={ref} id="cs-widget-chart">
