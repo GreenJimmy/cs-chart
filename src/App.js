@@ -418,7 +418,7 @@ function App(props) {
             {viewResult ? (
               <div
                 id="result-content"
-                className="area-info d-flex align-items-center"
+                className="area-info d-flex align-items-start"
               >
                 <Row className="justify-content-center">
                   <Col md="10" lg="8" xl="6" className="px-0 px-sm-3 text-left">
