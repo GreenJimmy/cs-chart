@@ -1,8 +1,9 @@
 {
   "name": "@greenjimmy/cs-chart",
-  "version": "0.2.0",
+  "version": "0.2.6",
   "description": "Form questions with charted results",
   "main": "lib/index.js",
+  "style": "lib/index.css",
   "files": [
     "lib/**/*"
   ],
@@ -11,9 +12,10 @@
     "build:prod": "webpack --env.ENVIRONMENT=production --config webpack.config.js",
     "build:dev": "webpack --env.ENVIRONMENT=development --config webpack.config.js",
     "build:package": "webpack --env.ENVIRONMENT=production --config webpack.package.config.js",
+    "css": "sass src/assets/css/index.scss lib/index.css",
     "pretty": "prettier --write ./src/**/*.js",
     "lint": "eslint ./src",
-    "deploy": "npm run pretty && npm run lint && npm run build:package && npm publish"
+    "deploy": "npm run pretty && npm run lint && npm run build:package && npm run css && npm publish"
   },
   "author": "JT <j.thompson@mac.com>",
   "license": "MIT",

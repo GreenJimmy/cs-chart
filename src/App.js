@@ -16,9 +16,9 @@ import PropTypes from 'prop-types';
 import FormData from './widgets/questions';
 import ResultsData from './widgets/results';
 
-import './assets/css/index.scss';
-
-const parseQS = queryString.parse(window.location.search);
+const parseQS = queryString.parse(
+  typeof window !== 'undefined' ? window.location.search : ''
+);
 
 let csAnswers;
 let csAutoAnswer = false;
@@ -152,13 +152,14 @@ function App(props) {
         areaUnanswered(allAreas[goToArea])
       );
       setTimeout(() => {
-        const showQuestion = document
-          ? document.getElementById(
-              `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
-            )
-          : null;
+        const showQuestion =
+          typeof document !== 'undefined'
+            ? document.getElementById(
+                `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
+              )
+            : null;
 
-        if (showQuestion && loaded.current && document) {
+        if (showQuestion && loaded.current && typeof document !== 'undefined') {
           document
             .getElementById(
               `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
@@ -229,9 +230,11 @@ function App(props) {
   }, [answers]);
 
   useEffect(() => {
-    document
-      .getElementById('cs-widget-chart')
-      .scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (typeof document !== 'undefined') {
+      document
+        .getElementById('cs-widget-chart')
+        .scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [showChart]);
 
   return (
@@ -519,12 +522,14 @@ function App(props) {
                         onClick={() => {
                           setViewResult(area);
                           window.setTimeout(() => {
-                            document
-                              .getElementById('cs-widget-chart')
-                              .scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start',
-                              });
+                            if (typeof document !== 'undefined') {
+                              document
+                                .getElementById('cs-widget-chart')
+                                .scrollIntoView({
+                                  behavior: 'smooth',
+                                  block: 'start',
+                                });
+                            }
                           }, 250);
                         }}
                         onKeyPress={() => setViewResult(area)}
