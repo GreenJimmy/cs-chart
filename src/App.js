@@ -152,11 +152,13 @@ function App(props) {
         areaUnanswered(allAreas[goToArea])
       );
       setTimeout(() => {
-        const showQuestion = document.getElementById(
-          `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
-        );
+        const showQuestion = document
+          ? document.getElementById(
+              `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
+            )
+          : null;
 
-        if (showQuestion && loaded.current) {
+        if (showQuestion && loaded.current && document) {
           document
             .getElementById(
               `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
