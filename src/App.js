@@ -31,11 +31,11 @@ if (parseQS['CS-AUTO-ANSWERS']) {
 }
 
 const getScoreLabel = (score) =>
-  score >= 75
+  score > 75
     ? 'Optimized'
-    : score >= 50
+    : score > 50
     ? 'Managed'
-    : score >= 25
+    : score > 25
     ? 'Basic'
     : 'Adhoc';
 
