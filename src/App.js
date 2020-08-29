@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import { BsCheck, BsCheckBox, BsSquare } from 'react-icons/bs';
 import queryString from 'query-string';
+import PropTypes from 'prop-types';
 
 import FormData from './widgets/questions';
 import ResultsData from './widgets/results';
@@ -62,7 +63,9 @@ const makeViewQuestions = (Data) => {
   return results;
 };
 
-function App() {
+function App(props) {
+  const { contactClick } = props;
+
   const [showChart, setShowChart] = useState(false);
   const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
   const [scores, setScores] = useState({});
@@ -70,6 +73,21 @@ function App() {
   const [viewArea, setViewArea] = useState(Object.keys(FormData)[0]);
   const [viewResult, setViewResult] = useState();
   const ref = useRef(null);
+  const loaded = useRef();
+
+  const getContactClick = () => {
+    const FormAnswers = `${window.location.protocol}//${window.location.host}${
+      window.location.pathname
+    }?CS-ANSWERS=${encodeURIComponent(JSON.stringify(answers))}`;
+
+    if (contactClick) {
+      contactClick({ FormAnswers });
+    } else {
+      window.location.href = `/contact?FormAnswers=${encodeURIComponent(
+        FormAnswers
+      )}`;
+    }
+  };
 
   const turnOffResult = () => {
     if (viewResult) {
@@ -138,13 +156,14 @@ function App() {
           `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
         );
 
-        if (showQuestion) {
+        if (showQuestion && loaded.current) {
           document
             .getElementById(
               `question:${goToArea}:${areaUnanswered(allAreas[goToArea])}`
             )
             .scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+        loaded.current = true;
       }, 500);
     } else {
       setShowChart(true);
@@ -392,9 +411,12 @@ function App() {
         ) : (
           <div className="graph-wrapper">
             {viewResult ? (
-              <div className="area-info d-flex align-items-center">
+              <div
+                id="result-content"
+                className="area-info d-flex align-items-center"
+              >
                 <Row className="justify-content-center">
-                  <Col md="10" lg="8" xl="6">
+                  <Col md="10" lg="8" xl="6" className="px-0 px-sm-3 text-left">
                     <div
                       className={`result-content border shadow ${viewResult}`}
                     >
@@ -432,15 +454,7 @@ function App() {
                 <Button
                   size="lg"
                   className="button-getintouch mx-2 mb-3"
-                  onClick={() => {
-                    window.location.href = `/contact?formAnswers=${encodeURIComponent(
-                      `${window.location.protocol}//${window.location.host}${
-                        window.location.pathname
-                      }?CS-ANSWERS=${encodeURIComponent(
-                        JSON.stringify(answers)
-                      )}`
-                    )}`;
-                  }}
+                  onClick={getContactClick}
                 >
                   Get Results
                 </Button>
@@ -500,7 +514,17 @@ function App() {
                       <div
                         role="button"
                         tabIndex="0"
-                        onClick={() => setViewResult(area)}
+                        onClick={() => {
+                          setViewResult(area);
+                          window.setTimeout(() => {
+                            document
+                              .getElementById('cs-widget-chart')
+                              .scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                              });
+                          }, 250);
+                        }}
                         onKeyPress={() => setViewResult(area)}
                         className={`w-100 bar ${area} text-center text-white`}
                         style={{ height: `${scores[area]}%` }}
@@ -561,5 +585,12 @@ function App() {
     </>
   );
 }
+
+App.propTypes = {
+  contactClick: PropTypes.func,
+};
+App.defaultProps = {
+  contactClick: null,
+};
 
 export default App;

@@ -1,10 +1,10 @@
 {
   "name": "@greenjimmy/cs-chart",
-  "version": "0.1.1",
+  "version": "0.1.9",
   "description": "Form questions with charted results",
-  "main": "/lib/index.js",
+  "main": "lib/index.js",
   "files": [
-    "/lib/**/*"
+    "lib/**/*"
   ],
   "scripts": {
     "start": "webpack-dev-server --env.ENVIRONMENT=development --config webpack.config.js",

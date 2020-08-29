@@ -295,6 +295,20 @@ body {
     }
   }
 
+  ul {
+    list-style: disc !important;
+    padding-left: 1.5rem !important;
+  }
+  ol,
+  p,
+  ul {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  li {
+    margin-bottom: 0.5rem;
+  }
+
   .button-getintouch {
     background-color: #3067db;
     border-color: #3067db;
