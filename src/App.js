@@ -65,6 +65,8 @@ const makeViewQuestions = (Data) => {
 
 function App(props) {
   const { contactClick } = props;
+  const seenChart = useRef(false);
+  const selectedAnswer = useRef(false);
 
   const [showChart, setShowChart] = useState(false);
   const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
@@ -112,8 +114,8 @@ function App(props) {
   const answered = (questionArea, questionIndex, score) => {
     const newAnswers = { ...answers };
     const allAreas = Object.keys(newAnswers);
-
     newAnswers[questionArea][questionIndex] = score;
+    selectedAnswer.current = true;
 
     const areaUnanswered = (area) =>
       Math.max(
@@ -168,7 +170,8 @@ function App(props) {
         }
         loaded.current = true;
       }, 500);
-    } else {
+    } else if (!seenChart.current) {
+      seenChart.current = true;
       setShowChart(true);
     }
 
@@ -230,7 +233,7 @@ function App(props) {
   }, [answers]);
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
+    if (typeof document !== 'undefined' && selectedAnswer.current === true) {
       document
         .getElementById('cs-widget-chart')
         .scrollIntoView({ behavior: 'smooth', block: 'start' });
