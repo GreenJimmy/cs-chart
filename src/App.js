@@ -424,7 +424,7 @@ function App(props) {
                 className="area-info d-flex align-items-start"
               >
                 <Row className="justify-content-center">
-                  <Col md="10" lg="8" xl="6" className="px-0 px-sm-3 text-left">
+                  <Col md="10" lg="9" xl="8" className="px-0 px-sm-3 text-left">
                     <div
                       className={`result-content border shadow ${viewResult}`}
                     >

@@ -258,7 +258,7 @@ const FormData = {
         answers: [
           'Data is used to continually monitor performance to plan and goals, and evaluate the need for strategy shift',
           'Data is used to periodically evaluate performance to plan at multiple level in the organization',
-          'Data is used to occasionally, on-demand to monitor top level performance to plan',
+          'Data is used occasionally to monitor top level performance to plan',
           'Data is not commonly used in analytics',
           'No Answer',
         ],
