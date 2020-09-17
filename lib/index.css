@@ -8771,7 +8771,7 @@ a#cs-widget-chart .badge-dark:focus, a#cs-widget-chart .badge-dark.focus {
     font-size: 14px;
   }
   #cs-widget-chart .bar {
-    padding: 20px !important;
+    padding: 16px !important;
     margin: 0 15px;
   }
 }
