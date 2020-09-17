@@ -8743,6 +8743,10 @@ a#cs-widget-chart .badge-dark:focus, a#cs-widget-chart .badge-dark.focus {
 #cs-widget-chart li {
   margin-bottom: 0.5rem;
 }
+#cs-widget-chart button.more-info:hover {
+  background-color: transparent;
+  color: white;
+}
 #cs-widget-chart .button-getintouch {
   background-color: #3067db;
   border-color: #3067db;

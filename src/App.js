@@ -18,7 +18,6 @@ import {
   BsFillInfoCircleFill,
 } from 'react-icons/bs';
 import queryString from 'query-string';
-import PropTypes from 'prop-types';
 import emailjs from 'emailjs-com';
 
 import { PDFDocument } from 'pdf-lib';
@@ -29,32 +28,9 @@ import ResultsData from './widgets/results';
 // Initialize sending emails
 emailjs.init('user_9go6NKx2pAtxgQ44Koyt8');
 
-const pageRange = async (from, to) =>
-  Array.from(Array(to - from + 1), (_, i) => i + from);
-
-const sendTest = async (surveyScores) => {
-  console.log(surveyScores);
-  return;
-  const pdf = await createPdf(surveyScores);
-  console.log(pdf);
-
-  const templateParams = {
-    send_to: 'j.thompson@mac.com',
-    'survery-results': pdf,
-  };
-
-  emailjs.send('default_service', 'send_survey', templateParams).then(
-    (response) => {
-      console.log('SUCCESS!', response.status, response.text);
-    },
-    (error) => {
-      console.error('FAILED...', error);
-    }
-  );
-};
-
 const validateEmail = (email) => {
-  const expression = /(?!.*\.{2})^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+  // eslint-disable-next-line no-control-regex
+  const expression = /(?!.*\.{2})^([a-z\d!#$%&'*+\-/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
 
   return expression.test(String(email).toLowerCase());
 };
@@ -68,9 +44,6 @@ const getScoreLabel = (score) =>
     ? 'Basic'
     : 'Adhoc';
 
-const getScorePage = (score) =>
-  score > 75 ? 4 : score > 50 ? 3 : score > 25 ? 2 : 1;
-
 const alertCS = async (info, link) => {
   const templateParams = {
     submitted_email: info.email,
@@ -79,11 +52,11 @@ const alertCS = async (info, link) => {
   };
 
   await emailjs.send('default_service', 'survery_taken', templateParams).then(
-    (response) => {
-      console.log('SUCCESS!', response.status, response.text);
+    () => {
+      // console.log('SUCCESS!', response.status, response.text);
     },
-    (error) => {
-      console.error('FAILED...', error);
+    () => {
+      // console.error('FAILED...', error);
     }
   );
 
@@ -220,7 +193,9 @@ const createPdf = async (info, link, surveyScores) => {
 
       return true;
     })
-    .catch((error) => console.error(error));
+    .catch(() => {
+      // console.error(error)
+    });
 };
 
 const parseQS = queryString.parse(
@@ -261,8 +236,7 @@ const makeViewQuestions = (Data) => {
   return results;
 };
 
-function App(props) {
-  const { contactClick } = props;
+function App() {
   const seenChart = useRef(false);
   const selectedAnswer = useRef(false);
   const formEmail = useRef();
@@ -1014,12 +988,5 @@ function App(props) {
     </>
   );
 }
-
-App.propTypes = {
-  contactClick: PropTypes.func,
-};
-App.defaultProps = {
-  contactClick: null,
-};
 
 export default App;
