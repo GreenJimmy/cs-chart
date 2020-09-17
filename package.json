@@ -33,7 +33,9 @@
   "dependencies": {
     "bootstrap": "^4.5.2",
     "core-js": "^3.6.5",
+    "emailjs-com": "^2.6.3",
     "jquery": "^3.5.1",
+    "pdf-lib": "^1.10.0",
     "performance-now": "^2.1.0",
     "popper.js": "^1.16.1",
     "query-string": "^6.13.1",

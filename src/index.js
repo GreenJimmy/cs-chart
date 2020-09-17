@@ -6,7 +6,7 @@ import App from './App';
 import './assets/css/index.scss';
 
 ReactDOM.render(
-  <Container style={{ margin: '1000px 0' }}>
+  <Container>
     <App />
   </Container>,
   document.getElementById('root')

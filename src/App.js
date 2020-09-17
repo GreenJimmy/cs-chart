@@ -8,13 +8,220 @@ import {
   Card,
   ListGroup,
   Button,
+  Form,
+  Spinner,
 } from 'react-bootstrap';
-import { BsCheck, BsCheckBox, BsSquare } from 'react-icons/bs';
+import {
+  BsCheck,
+  BsCheckBox,
+  BsSquare,
+  BsFillInfoCircleFill,
+} from 'react-icons/bs';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
+import emailjs from 'emailjs-com';
+
+import { PDFDocument } from 'pdf-lib';
 
 import FormData from './widgets/questions';
 import ResultsData from './widgets/results';
+
+// Initialize sending emails
+emailjs.init('user_9go6NKx2pAtxgQ44Koyt8');
+
+const pageRange = async (from, to) =>
+  Array.from(Array(to - from + 1), (_, i) => i + from);
+
+const sendTest = async (surveyScores) => {
+  console.log(surveyScores);
+  return;
+  const pdf = await createPdf(surveyScores);
+  console.log(pdf);
+
+  const templateParams = {
+    send_to: 'j.thompson@mac.com',
+    'survery-results': pdf,
+  };
+
+  emailjs.send('default_service', 'send_survey', templateParams).then(
+    (response) => {
+      console.log('SUCCESS!', response.status, response.text);
+    },
+    (error) => {
+      console.error('FAILED...', error);
+    }
+  );
+};
+
+const validateEmail = (email) => {
+  const expression = /(?!.*\.{2})^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+
+  return expression.test(String(email).toLowerCase());
+};
+
+const getScoreLabel = (score) =>
+  score > 75
+    ? 'Optimized'
+    : score > 50
+    ? 'Managed'
+    : score > 25
+    ? 'Basic'
+    : 'Adhoc';
+
+const getScorePage = (score) =>
+  score > 75 ? 4 : score > 50 ? 3 : score > 25 ? 2 : 1;
+
+const alertCS = async (info, link) => {
+  const templateParams = {
+    submitted_email: info.email,
+    submitted_name: info.name,
+    survey_link: link,
+  };
+
+  await emailjs.send('default_service', 'survery_taken', templateParams).then(
+    (response) => {
+      console.log('SUCCESS!', response.status, response.text);
+    },
+    (error) => {
+      console.error('FAILED...', error);
+    }
+  );
+
+  return false;
+};
+
+const createPdf = async (info, link, surveyScores) => {
+  const ratio = 0.24;
+
+  Promise.all([
+    fetch('https://capabilitysource.com/pdf/first-page.pdf'),
+    fetch(
+      `https://capabilitysource.com/pdf/people-${getScoreLabel(
+        surveyScores.People
+      ).toLowerCase()}.pdf`
+    ),
+    fetch(
+      `https://capabilitysource.com/pdf/process-${getScoreLabel(
+        surveyScores.Process
+      ).toLowerCase()}.pdf`
+    ),
+    fetch(
+      `https://capabilitysource.com/pdf/technology-${getScoreLabel(
+        surveyScores.Technology
+      ).toLowerCase()}.pdf`
+    ),
+    fetch(
+      `https://capabilitysource.com/pdf/information-${getScoreLabel(
+        surveyScores.Information
+      ).toLowerCase()}.pdf`
+    ),
+    fetch('https://capabilitysource.com/pdf/last-page.pdf'),
+    fetch(
+      `https://capabilitysource.com/pdf/people-${getScoreLabel(
+        surveyScores.People
+      ).toLowerCase()}.png`
+    ),
+    fetch(
+      `https://capabilitysource.com/pdf/process-${getScoreLabel(
+        surveyScores.Process
+      ).toLowerCase()}.png`
+    ),
+    fetch(
+      `https://capabilitysource.com/pdf/technology-${getScoreLabel(
+        surveyScores.Technology
+      ).toLowerCase()}.png`
+    ),
+    fetch(
+      `https://capabilitysource.com/pdf/information-${getScoreLabel(
+        surveyScores.Information
+      ).toLowerCase()}.png`
+    ),
+  ])
+    .then((responses) =>
+      // Get a JSON object from each of the responses
+      Promise.all(responses.map((response) => response.arrayBuffer()))
+    )
+    .then(async (data) => {
+      const returnPdf = await PDFDocument.create();
+
+      const firstPage = await returnPdf.copyPages(
+        await PDFDocument.load(data[0]),
+        [0]
+      );
+      const peoplePage = await returnPdf.copyPages(
+        await PDFDocument.load(data[1]),
+        [0]
+      );
+      const processPage = await returnPdf.copyPages(
+        await PDFDocument.load(data[2]),
+        [0]
+      );
+      const technologyPage = await returnPdf.copyPages(
+        await PDFDocument.load(data[3]),
+        [0]
+      );
+      const informationPage = await returnPdf.copyPages(
+        await PDFDocument.load(data[4]),
+        [0]
+      );
+      const lastPage = await returnPdf.copyPages(
+        await PDFDocument.load(data[5]),
+        [0]
+      );
+
+      returnPdf.addPage(firstPage[0]);
+      returnPdf.addPage(peoplePage[0]);
+      returnPdf.addPage(processPage[0]);
+      returnPdf.addPage(technologyPage[0]);
+      returnPdf.addPage(informationPage[0]);
+      returnPdf.addPage(lastPage[0]);
+
+      const peopleBar = await returnPdf.embedPng(data[6]);
+      const processBar = await returnPdf.embedPng(data[7]);
+      const technologyBar = await returnPdf.embedPng(data[8]);
+      const informationBar = await returnPdf.embedPng(data[9]);
+
+      returnPdf.getPage(0).drawImage(peopleBar, {
+        x: 1650 * ratio,
+        y: 2469 * ratio,
+        width: 424 * ratio,
+        height: 1200 * ratio,
+      });
+      returnPdf.getPage(0).drawImage(processBar, {
+        x: 2249 * ratio,
+        y: 2469 * ratio,
+        width: 424 * ratio,
+        height: 1200 * ratio,
+      });
+      returnPdf.getPage(0).drawImage(technologyBar, {
+        x: 2840 * ratio,
+        y: 2469 * ratio,
+        width: 424 * ratio,
+        height: 1200 * ratio,
+      });
+      returnPdf.getPage(0).drawImage(informationBar, {
+        x: 3438 * ratio,
+        y: 2469 * ratio,
+        width: 424 * ratio,
+        height: 1200 * ratio,
+      });
+
+      const pdfBytes = await returnPdf.save();
+
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const invisAnchor = document.createElement('a');
+      invisAnchor.href = window.URL.createObjectURL(blob);
+      invisAnchor.download = 'SPB-Results.pdf';
+      invisAnchor.click();
+
+      if (info && link) {
+        await alertCS(info, link);
+      }
+
+      return true;
+    })
+    .catch((error) => console.error(error));
+};
 
 const parseQS = queryString.parse(
   typeof window !== 'undefined' ? window.location.search : ''
@@ -29,15 +236,6 @@ if (parseQS['CS-ANSWERS']) {
 if (parseQS['CS-AUTO-ANSWERS']) {
   csAutoAnswer = true;
 }
-
-const getScoreLabel = (score) =>
-  score > 75
-    ? 'Optimized'
-    : score > 50
-    ? 'Managed'
-    : score > 25
-    ? 'Basic'
-    : 'Adhoc';
 
 const makeAnswers = (Data) => {
   const results = {};
@@ -67,8 +265,15 @@ function App(props) {
   const { contactClick } = props;
   const seenChart = useRef(false);
   const selectedAnswer = useRef(false);
+  const formEmail = useRef();
+  const formName = useRef();
 
+  const [agreed, setAgreed] = useState(false);
+  const [showFormError, setShowFormError] = useState(false);
+  const [allAgreement, setAllAgreement] = useState(false);
   const [showChart, setShowChart] = useState(false);
+  const [showGetPdf, setShowGetPdf] = useState(false);
+  const [sendingPdf, setSendingPdf] = useState(false);
   const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
   const [scores, setScores] = useState({});
   const [viewQuestion, setViewQuestion] = useState(makeViewQuestions(FormData));
@@ -82,13 +287,7 @@ function App(props) {
       window.location.pathname
     }?CS-ANSWERS=${encodeURIComponent(JSON.stringify(answers))}`;
 
-    if (contactClick) {
-      contactClick({ FormAnswers });
-    } else {
-      window.location.href = `/contact?FormAnswers=${encodeURIComponent(
-        FormAnswers
-      )}`;
-    }
+    return FormAnswers;
   };
 
   const turnOffResult = () => {
@@ -243,7 +442,129 @@ function App(props) {
   return (
     <>
       <div ref={ref} id="cs-widget-chart">
-        {!showChart ? (
+        {!agreed ? (
+          <Row className="justify-content-center">
+            <Col md="12" lg="10" xl="8" className="text-center">
+              <h2>Take Our Survey</h2>
+              <p>
+                By using this Readiness Calculator, you attest to have read and
+                agreed to our{' '}
+                <a href="#0" onClick={() => setAllAgreement(true)}>
+                  Terms and Conditions and Privacy Policy
+                </a>
+                .
+              </p>
+              {allAgreement ? (
+                <div
+                  className="p-3 m-3 border text-left"
+                  style={{ height: '200px', overflowY: 'auto' }}
+                >
+                  <p>
+                    Use of the Readiness Calculator and submission of your data
+                    is voluntary. By using the Readiness Calculator, you agree
+                    to share your data and responses with CapabilitySource.
+                    CapabilitySource utilizes the data you provide to generate
+                    automated information output. Upon submission of your data,
+                    CapabilitySource will generate online content, and a report
+                    will be distributed to you by email. In providing your email
+                    address you attest to be the owner of that address and agree
+                    to receive communications from CapabilitySource or its
+                    partners. The content on this website is for convenience and
+                    information purposes only. CapabilitySource offers
+                    consultation meetings to further qualify Readiness
+                    Calculator results and evaluate solution alternatives.
+                    Consult your company policies and procedures before making
+                    decisions. Terms of Submission: You agree that: Your
+                    submission does not create any contract, whether implied or
+                    expressed, between you and CapabilitySource or its partners.
+                  </p>
+                  <ul>
+                    <li>
+                      Your response to the questions in the Readiness Calculator
+                      will automatically become the property of
+                      CapabilitySource, without compensation to you,
+                    </li>
+                    <li>
+                      CapabilitySource can use your data, in any way, and
+                      without attribution or compensation to you,
+                    </li>
+                    <li>
+                      Any information you provide will be considered
+                      non-confidential.
+                    </li>
+                    <li>
+                      You attest that you are the owner of the email address you
+                      provide and to be contacted by CapabilitySource or its
+                      partners.
+                    </li>
+                  </ul>
+                  <h4>INFORMATION COLLECTION, USE, AND SHARING</h4>
+                  <p>
+                    CapabilitySource Inc. is the owner of the information
+                    collected on this site. We only have access to/collect
+                    information that you voluntarily give us via email,
+                    electronic submission of our online form or this website, or
+                    other direct contact from you. We will not disclose, sell or
+                    rent this information to anyone.
+                  </p>
+                  <p>
+                    CapabilitySource does not capture anonymous or demographic
+                    analytics data on this website.
+                  </p>
+                  <p>
+                    Should you choose to use our Request A Consultation or Leave
+                    Us A Message online forms; information we collect is used
+                    for the purpose of understanding your business, your needs,
+                    and acquiring your contact information to respond
+                    accordingly. Please be mindful of the information you share
+                    and do not include any highly sensitive information. Upon
+                    submission of the form, the data entered is used to populate
+                    the body of an email received by
+                    solutions@capabilitysource.com . The information is not
+                    stored via other means. You may choose to share your
+                    information by sending an email directly to that address or
+                    contacting us by phone at (866) 406-2790.
+                  </p>
+                  <p>
+                    We may contact you via email or phone call based on your
+                    initial outreach to us for information or our services. You
+                    may choose to opt out of any future communications at any
+                    time by contacting us at privacy@capabilitysource.com
+                  </p>
+                  <p>
+                    We will use your information to respond to you, regarding
+                    the reason you contacted us. Your contact information
+                    collected, including name, email address and phone number is
+                    intended solely for CapabilitySource’s business use. Your
+                    information will be treated in confidence and it will not be
+                    disclosed to other parties.
+                  </p>
+                  <p>
+                    CapabilitySource does not knowingly collect Personal Data
+                    from children under the age of 16. If you are under the age
+                    of 16, do not submit any Personal Data through the online
+                    form services, nor contact us by email. We encourage parents
+                    and legal guardians to monitor their children’s Internet
+                    usage and to help enforce our Privacy Policy by instructing
+                    their children never to provide Personal Data on the Service
+                    without their permission. If you have reason to believe that
+                    a child under the age of 16 has provided Personal Data to
+                    CapabilitySource, please contact us at
+                    privacy@capabilitysource.com , and we will delete that
+                    information.
+                  </p>
+                </div>
+              ) : null}
+              <Button
+                size="lg"
+                className="button-getintouch mx-2 mb-3"
+                onClick={() => setAgreed(true)}
+              >
+                Start Survery
+              </Button>
+            </Col>
+          </Row>
+        ) : !showChart ? (
           <Row>
             <Col>
               <Tab.Container activeKey={viewArea}>
@@ -453,6 +774,96 @@ function App(props) {
               </div>
             ) : null}
 
+            {showGetPdf ? (
+              <div
+                id="result-content"
+                className="area-info d-flex align-items-start"
+              >
+                <Row className="justify-content-center w-100">
+                  <Col md="10" lg="8" xl="6">
+                    <div className="result-content border shadow text-center">
+                      <button
+                        type="button"
+                        className="close"
+                        style={{
+                          position: 'absolute',
+                          top: '-2rem',
+                          right: '-1rem',
+                        }}
+                        onClick={() => setShowGetPdf(false)}
+                      >
+                        <span aria-hidden="true">×</span>
+                        <span className="sr-only">Close</span>
+                      </button>
+                      <h3 className="mb-4">Get Your Results in PDF</h3>
+                      <Form.Control
+                        type="text"
+                        name="Name"
+                        className="mb-3"
+                        placeholder="Name"
+                        ref={formName}
+                        disabled={sendingPdf}
+                      />
+                      <Form.Control
+                        type="text"
+                        name="Email"
+                        className="mb-3"
+                        placeholder="Email"
+                        ref={formEmail}
+                        disabled={sendingPdf}
+                      />
+                      {showFormError ? (
+                        <p className="text-danger my-3">
+                          Please submit a valid email address.
+                        </p>
+                      ) : null}
+                      <Button
+                        size="lg"
+                        className="button-getintouch mx-2 mx-auto"
+                        onClick={async () => {
+                          const name = formName.current.value;
+                          const email = formEmail.current.value;
+
+                          if (!validateEmail(email)) {
+                            setShowFormError(true);
+                          } else {
+                            setShowFormError(false);
+                            setSendingPdf(true);
+                            await createPdf(
+                              {
+                                email,
+                                name,
+                              },
+                              getContactClick(),
+                              scores
+                            );
+                            if (typeof window !== 'undefined') {
+                              window.setTimeout(() => {
+                                setShowGetPdf(false);
+                              }, 200);
+                            }
+                          }
+                        }}
+                        disabled={sendingPdf}
+                      >
+                        {sendingPdf ? (
+                          <Spinner
+                            as="span"
+                            animation="border"
+                            size="lg"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          'Submit'
+                        )}
+                      </Button>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            ) : null}
+
             <Row className="flex-shrink-1">
               <Col className="text-center">
                 <h2>The results are in!</h2>
@@ -462,7 +873,7 @@ function App(props) {
                 <Button
                   size="lg"
                   className="button-getintouch mx-2 mb-3"
-                  onClick={getContactClick}
+                  onClick={() => setShowGetPdf(true)}
                 >
                   Get Results
                 </Button>
@@ -475,7 +886,7 @@ function App(props) {
                 </Button>
               </Col>
             </Row>
-            <Row className="flex-grow-1" style={{ minHeight: '500px' }}>
+            <Row className="flex-grow-1 mt-3" style={{ minHeight: '500px' }}>
               <Col md="3" lg="2" className="d-md-flex pr-0 d-none border-right">
                 <Row className="flex-grow-1">
                   <Col className="d-flex flex-column">
@@ -542,6 +953,14 @@ function App(props) {
                         <small className="d-block">
                           <strong>{getScoreLabel(scores[area])}</strong>
                         </small>
+                        <Button
+                          size="sm"
+                          variant="outline-light"
+                          className="my-3 more-info d-flex align-items-center mx-auto"
+                        >
+                          More Info
+                          <BsFillInfoCircleFill className="ml-2" />
+                        </Button>
                         <div className="d-md-none">
                           {getScoreLabel(scores[area]) === 'Optimized' ? (
                             <small>

@@ -308,6 +308,10 @@ body {
   li {
     margin-bottom: 0.5rem;
   }
+  button.more-info:hover {
+    background-color: transparent;
+    color: white;
+  }
 
   .button-getintouch {
     background-color: #3067db;
