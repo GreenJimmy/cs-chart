@@ -51,7 +51,7 @@ const alertCS = async (info, link) => {
     survey_link: link,
   };
 
-  await emailjs.send('default_service', 'survery_taken', templateParams).then(
+  await emailjs.send('default_service', 'survey_taken', templateParams).then(
     () => {
       // console.log('SUCCESS!', response.status, response.text);
     },
@@ -534,7 +534,7 @@ function App() {
                 className="button-getintouch mx-2 mb-3"
                 onClick={() => setAgreed(true)}
               >
-                Start Survery
+                Start Survey
               </Button>
             </Col>
           </Row>
@@ -583,7 +583,7 @@ function App() {
                   <Col md={9}>
                     <Row
                       noGutters
-                      className="d-flex d-md-none survery-top-nav"
+                      className="d-flex d-md-none survey-top-nav"
                       xs="2"
                       sm="4"
                     >

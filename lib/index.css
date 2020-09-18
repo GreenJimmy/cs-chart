@@ -8621,42 +8621,42 @@ a#cs-widget-chart .badge-dark:focus, a#cs-widget-chart .badge-dark.focus {
   border-color: #3067db;
   color: #3067db;
 }
-#cs-widget-chart .survery-top-nav .btn-link {
+#cs-widget-chart .survey-top-nav .btn-link {
   display: block;
   text-align: center;
   padding: 0.5rem;
   width: 100%;
   margin-bottom: 1rem;
 }
-#cs-widget-chart .survery-top-nav .btn-link:hover, #cs-widget-chart .survery-top-nav .btn-link.active {
+#cs-widget-chart .survey-top-nav .btn-link:hover, #cs-widget-chart .survey-top-nav .btn-link.active {
   color: #fff;
   text-decoration: none !important;
 }
-#cs-widget-chart .survery-top-nav .btn-link.People {
+#cs-widget-chart .survey-top-nav .btn-link.People {
   color: #db356a;
 }
-#cs-widget-chart .survery-top-nav .btn-link.People.active {
+#cs-widget-chart .survey-top-nav .btn-link.People.active {
   background-color: #db356a;
   color: #fff;
 }
-#cs-widget-chart .survery-top-nav .btn-link.Process {
+#cs-widget-chart .survey-top-nav .btn-link.Process {
   color: #26a2dc;
 }
-#cs-widget-chart .survery-top-nav .btn-link.Process.active {
+#cs-widget-chart .survey-top-nav .btn-link.Process.active {
   background-color: #26a2dc;
   color: #fff;
 }
-#cs-widget-chart .survery-top-nav .btn-link.Technology {
+#cs-widget-chart .survey-top-nav .btn-link.Technology {
   color: #9dc555;
 }
-#cs-widget-chart .survery-top-nav .btn-link.Technology.active {
+#cs-widget-chart .survey-top-nav .btn-link.Technology.active {
   background-color: #9dc555;
   color: #fff;
 }
-#cs-widget-chart .survery-top-nav .btn-link.Information {
+#cs-widget-chart .survey-top-nav .btn-link.Information {
   color: #f36c21;
 }
-#cs-widget-chart .survery-top-nav .btn-link.Information.active {
+#cs-widget-chart .survey-top-nav .btn-link.Information.active {
   background-color: #f36c21;
   color: #fff;
 }
