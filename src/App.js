@@ -418,114 +418,56 @@ function App() {
       <div ref={ref} id="cs-widget-chart">
         {!agreed ? (
           <Row className="justify-content-center">
-            <Col md="12" lg="10" xl="8" className="text-center">
-              <h2>Take Our Survey</h2>
+            <Col className="text-center">
+              <h2>Agile Strategy Readiness</h2>
               <p>
-                By using this Readiness Calculator, you attest to have read and
-                agreed to our{' '}
-                <a href="#0" onClick={() => setAllAgreement(true)}>
-                  Terms and Conditions and Privacy Policy
-                </a>
-                .
+                Answer a minimum of 4 questions in each section to view results.
               </p>
+              <small className="mb-3 d-block">
+                <em>
+                  By using the Readiness Calculator, you agree to the{' '}
+                  <a href="#0" onClick={() => setAllAgreement(true)}>
+                    Terms of Use
+                  </a>
+                  .
+                </em>
+              </small>
               {allAgreement ? (
                 <div
-                  className="p-3 m-3 border text-left"
+                  className="p-3 mb-3 border text-left"
                   style={{ height: '200px', overflowY: 'auto' }}
                 >
                   <p>
                     Use of the Readiness Calculator and submission of your data
                     is voluntary. By using the Readiness Calculator, you agree
-                    to share your data and responses with CapabilitySource.
-                    CapabilitySource utilizes the data you provide to generate
-                    automated information output. Upon submission of your data,
-                    CapabilitySource will generate online content, and a report
-                    will be distributed to you by email. In providing your email
-                    address you attest to be the owner of that address and agree
-                    to receive communications from CapabilitySource or its
-                    partners. The content on this website is for convenience and
-                    information purposes only. CapabilitySource offers
-                    consultation meetings to further qualify Readiness
-                    Calculator results and evaluate solution alternatives.
-                    Consult your company policies and procedures before making
-                    decisions. Terms of Submission: You agree that: Your
-                    submission does not create any contract, whether implied or
-                    expressed, between you and CapabilitySource or its partners.
-                  </p>
-                  <ul>
-                    <li>
-                      Your response to the questions in the Readiness Calculator
-                      will automatically become the property of
-                      CapabilitySource, without compensation to you,
-                    </li>
-                    <li>
-                      CapabilitySource can use your data, in any way, and
-                      without attribution or compensation to you,
-                    </li>
-                    <li>
-                      Any information you provide will be considered
-                      non-confidential.
-                    </li>
-                    <li>
-                      You attest that you are the owner of the email address you
-                      provide and to be contacted by CapabilitySource or its
-                      partners.
-                    </li>
-                  </ul>
-                  <h4>INFORMATION COLLECTION, USE, AND SHARING</h4>
-                  <p>
-                    CapabilitySource Inc. is the owner of the information
-                    collected on this site. We only have access to/collect
-                    information that you voluntarily give us via email,
-                    electronic submission of our online form or this website, or
-                    other direct contact from you. We will not disclose, sell or
-                    rent this information to anyone.
+                    to share your data and responses with CapabilitySource. Upon
+                    submission of your data, CapabilitySource will generate
+                    online content, and a report will be distributed to the
+                    email address you provide. In providing an email address you
+                    attest to be the owner of the address and agree to receive
+                    communications from CapabilitySource at the address.
                   </p>
                   <p>
-                    CapabilitySource does not capture anonymous or demographic
-                    analytics data on this website.
+                    The content on this website is for convenience and
+                    information purposes only. Your submission does not create a
+                    contract, whether implied or expressed, between you and
+                    CapabilitySource or its partners. We collect only
+                    information that you voluntarily provide via electronic
+                    submission of an online form. We will not disclose, sell or
+                    rent this information without your express written
+                    permission. CapabilitySource does not capture anonymous or
+                    demographic analytics data on this website.
                   </p>
                   <p>
-                    Should you choose to use our Request A Consultation or Leave
-                    Us A Message online forms; information we collect is used
-                    for the purpose of understanding your business, your needs,
-                    and acquiring your contact information to respond
-                    accordingly. Please be mindful of the information you share
-                    and do not include any highly sensitive information. Upon
-                    submission of the form, the data entered is used to populate
-                    the body of an email received by
-                    solutions@capabilitysource.com . The information is not
-                    stored via other means. You may choose to share your
-                    information by sending an email directly to that address or
-                    contacting us by phone at (866) 406-2790.
-                  </p>
-                  <p>
-                    We may contact you via email or phone call based on your
-                    initial outreach to us for information or our services. You
-                    may choose to opt out of any future communications at any
-                    time by contacting us at privacy@capabilitysource.com
-                  </p>
-                  <p>
-                    We will use your information to respond to you, regarding
-                    the reason you contacted us. Your contact information
-                    collected, including name, email address and phone number is
-                    intended solely for CapabilitySource’s business use. Your
-                    information will be treated in confidence and it will not be
-                    disclosed to other parties.
-                  </p>
-                  <p>
-                    CapabilitySource does not knowingly collect Personal Data
-                    from children under the age of 16. If you are under the age
-                    of 16, do not submit any Personal Data through the online
-                    form services, nor contact us by email. We encourage parents
-                    and legal guardians to monitor their children’s Internet
-                    usage and to help enforce our Privacy Policy by instructing
-                    their children never to provide Personal Data on the Service
-                    without their permission. If you have reason to believe that
-                    a child under the age of 16 has provided Personal Data to
-                    CapabilitySource, please contact us at
-                    privacy@capabilitysource.com , and we will delete that
-                    information.
+                    Should you choose to use a Readiness Calculator on this
+                    website; information collected from you will be used for the
+                    purpose of understanding your business needs and responding
+                    accordingly. We may contact you via email or phone. You may
+                    choose to opt out of future communications at any time by
+                    contacting us at{' '}
+                    <a href="mailto:privacy@capabilitysource.com">
+                      privacy@capabilitysource.com
+                    </a>
                   </p>
                 </div>
               ) : null}
@@ -534,7 +476,7 @@ function App() {
                 className="button-getintouch mx-2 mb-3"
                 onClick={() => setAgreed(true)}
               >
-                Start Survey
+                Calculate Readiness
               </Button>
             </Col>
           </Row>
