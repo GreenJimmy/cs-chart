@@ -439,24 +439,27 @@ function App() {
                 >
                   <p>
                     Use of the Readiness Calculator and submission of your data
-                    is voluntary. By using the Readiness Calculator, you agree
-                    to share your data and responses with CapabilitySource. Upon
-                    submission of your data, CapabilitySource will generate
-                    online content, and a report will be distributed to the
-                    email address you provide. In providing an email address you
-                    attest to be the owner of the address and agree to receive
-                    communications from CapabilitySource at the address.
+                    via the online form is voluntary. By using the Readiness
+                    Calculator, you agree to share your data and responses with
+                    CapabilitySource. Upon submission of your data,
+                    CapabilitySource will generate online content, and a report
+                    will be distributed to the email address you provide. In
+                    providing an email address you attest to be the owner of the
+                    address and agree to receive communications from
+                    CapabilitySource at the address.
                   </p>
                   <p>
                     The content on this website is for convenience and
                     information purposes only. Your submission does not create a
                     contract, whether implied or expressed, between you and
-                    CapabilitySource or its partners. We collect only
-                    information that you voluntarily provide via electronic
-                    submission of an online form. We will not disclose, sell or
-                    rent this information without your express written
-                    permission. CapabilitySource does not capture anonymous or
-                    demographic analytics data on this website.
+                    CapabilitySource or its partners. However, we welcome the
+                    opportunity for future discussions regarding ways
+                    CapabilitySource can assist you with your marketing
+                    strategies. Any information you provide will be considered
+                    non-confidential. We will not disclose, sell or rent this
+                    information without your express written permission.
+                    CapabilitySource does not capture anonymous or demographic
+                    analytics data on this website.
                   </p>
                   <p>
                     Should you choose to use a Readiness Calculator on this
@@ -464,10 +467,11 @@ function App() {
                     purpose of understanding your business needs and responding
                     accordingly. We may contact you via email or phone. You may
                     choose to opt out of future communications at any time by
-                    contacting us at{' '}
+                    contacting us at
                     <a href="mailto:privacy@capabilitysource.com">
                       privacy@capabilitysource.com
                     </a>
+                    .
                   </p>
                 </div>
               ) : null}
