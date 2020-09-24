@@ -18,15 +18,13 @@ import {
   BsFillInfoCircleFill,
 } from 'react-icons/bs';
 import queryString from 'query-string';
-import emailjs from 'emailjs-com';
 
 import { PDFDocument } from 'pdf-lib';
 
 import FormData from './widgets/questions';
 import ResultsData from './widgets/results';
 
-// Initialize sending emails
-emailjs.init('user_9go6NKx2pAtxgQ44Koyt8');
+const assetBase = 'https://capabilitysource.com';
 
 const validateEmail = (email) => {
   // eslint-disable-next-line no-control-regex
@@ -44,68 +42,142 @@ const getScoreLabel = (score) =>
     ? 'Basic'
     : 'Adhoc';
 
-const alertCS = async (info, link) => {
-  const templateParams = {
-    submitted_email: info.email,
-    submitted_name: info.name,
-    survey_link: link,
-  };
-
-  await emailjs.send('default_service', 'survey_taken', templateParams).then(
-    () => {
-      // console.log('SUCCESS!', response.status, response.text);
+const alertUser = async (toObj, spbPdf) => {
+  await fetch('https://mandrillapp.com/api/1.0/messages/send-template.json', {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, *cors, same-origin
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/x-www-form-urlencoded',
     },
-    () => {
-      // console.error('FAILED...', error);
-    }
-  );
+    redirect: 'follow', // manual, *follow, error
+    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify({
+      key: '6SVyLcjG9Lt6Ff_UD_1JuA',
+      template_name: 'spb-readiness-calculator',
+      template_content: [
+        {
+          name: 'example name',
+          content: 'example content',
+        },
+      ],
+      message: {
+        to: [
+          {
+            email: toObj.email,
+            name: toObj.name,
+            type: 'to',
+          },
+        ],
+        attachments: [
+          {
+            type: 'application/pdf',
+            name: 'SPB-Results.pdf',
+            content: spbPdf,
+          },
+        ],
+      },
+    }), // body data type must match "Content-Type" header
+  });
 
-  return false;
+  return true;
+};
+
+const alertCS = async (toObj, link) => {
+  await fetch('https://mandrillapp.com/api/1.0/messages/send-template.json', {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, *cors, same-origin
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: 'follow', // manual, *follow, error
+    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify({
+      key: '6SVyLcjG9Lt6Ff_UD_1JuA',
+      template_name: 'notify-survey-taken',
+      template_content: [
+        {
+          name: 'example name',
+          content: 'example content',
+        },
+      ],
+      message: {
+        to: [
+          {
+            email: 'solutions@capabilitysource.com',
+            name: 'CapabilitySource',
+            type: 'to',
+          },
+        ],
+        global_merge_vars: [
+          {
+            name: 'SUBMITTED_NAME',
+            content: toObj.name,
+          },
+          {
+            name: 'SUBMITTED_EMAIL',
+            content: toObj.email,
+          },
+          {
+            name: 'SURVEY_LINK',
+            content: link,
+          },
+        ],
+      },
+    }), // body data type must match "Content-Type" header
+  });
+
+  return true;
 };
 
 const createPdf = async (info, link, surveyScores) => {
   const ratio = 0.24;
 
-  Promise.all([
-    fetch('https://capabilitysource.com/pdf/first-page.pdf'),
+  await Promise.all([
+    fetch(`${assetBase}/pdf/first-page.pdf`),
     fetch(
-      `https://capabilitysource.com/pdf/people-${getScoreLabel(
+      `${assetBase}/pdf/people-${getScoreLabel(
         surveyScores.People
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `https://capabilitysource.com/pdf/process-${getScoreLabel(
+      `${assetBase}/pdf/process-${getScoreLabel(
         surveyScores.Process
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `https://capabilitysource.com/pdf/technology-${getScoreLabel(
+      `${assetBase}/pdf/technology-${getScoreLabel(
         surveyScores.Technology
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `https://capabilitysource.com/pdf/information-${getScoreLabel(
+      `${assetBase}/pdf/information-${getScoreLabel(
         surveyScores.Information
       ).toLowerCase()}.pdf`
     ),
-    fetch('https://capabilitysource.com/pdf/last-page.pdf'),
+    fetch(`${assetBase}/pdf/last-page.pdf`),
     fetch(
-      `https://capabilitysource.com/pdf/people-${getScoreLabel(
+      `${assetBase}/pdf/people-${getScoreLabel(
         surveyScores.People
       ).toLowerCase()}.png`
     ),
     fetch(
-      `https://capabilitysource.com/pdf/process-${getScoreLabel(
+      `${assetBase}/pdf/process-${getScoreLabel(
         surveyScores.Process
       ).toLowerCase()}.png`
     ),
     fetch(
-      `https://capabilitysource.com/pdf/technology-${getScoreLabel(
+      `${assetBase}/pdf/technology-${getScoreLabel(
         surveyScores.Technology
       ).toLowerCase()}.png`
     ),
     fetch(
-      `https://capabilitysource.com/pdf/information-${getScoreLabel(
+      `${assetBase}/pdf/information-${getScoreLabel(
         surveyScores.Information
       ).toLowerCase()}.png`
     ),
@@ -179,23 +251,24 @@ const createPdf = async (info, link, surveyScores) => {
         height: 1200 * ratio,
       });
 
-      const pdfBytes = await returnPdf.save();
+      const base64Pdf = await returnPdf.saveAsBase64();
 
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const invisAnchor = document.createElement('a');
-      invisAnchor.href = window.URL.createObjectURL(blob);
-      invisAnchor.download = 'SPB-Results.pdf';
-      invisAnchor.click();
+      // const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      // const invisAnchor = document.createElement('a');
+      // invisAnchor.href = window.URL.createObjectURL(blob);
+      // invisAnchor.download = 'SPB-Results.pdf';
+      // invisAnchor.click();
 
-      if (info && link) {
-        await alertCS(info, link);
-      }
+      await alertCS(info, link);
+      await alertUser(info, base64Pdf);
 
       return true;
     })
     .catch(() => {
       // console.error(error)
     });
+
+  return true;
 };
 
 const parseQS = queryString.parse(
