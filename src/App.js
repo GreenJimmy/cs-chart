@@ -21,7 +21,37 @@ import queryString from 'query-string';
 
 import { PDFDocument } from 'pdf-lib';
 
-const assetBase = 'https://capabilitysource.com';
+import spbQuestions from './questions-spb';
+import spbRecommendations from './recommendations-spb';
+import mwmQuestions from './questions-mwm';
+import mwmRecommendations from './recommendations-mwm';
+
+const assetBase =
+  typeof window !== 'undefined' && window.ENVIRONMENT === 'production'
+    ? 'https://capabilitysource.com'
+    : '';
+
+const parseQS = queryString.parse(
+  typeof window !== 'undefined' ? window.location.search : ''
+);
+
+let csAnswers;
+let csAutoAnswer = false;
+let csFormType =
+  typeof window !== 'undefined' && window.CS_FORM
+    ? window.CS_FORM
+    : process.env.CS_FORM || 'spb';
+
+if (parseQS['CS-ANSWERS']) {
+  csAnswers = JSON.parse(parseQS['CS-ANSWERS']);
+}
+if (parseQS['CS-AUTO-ANSWERS']) {
+  csAutoAnswer = true;
+}
+
+if (parseQS['CS-FORM-type']) {
+  csFormType = parseQS['CS-FORM-type'];
+}
 
 const validateEmail = (email) => {
   // eslint-disable-next-line no-control-regex
@@ -136,45 +166,45 @@ const createPdf = async (formType, info, link, surveyScores) => {
   const ratio = 0.24;
 
   await Promise.all([
-    fetch(`${assetBase}/pdf-${formType}/first-page.pdf`),
+    fetch(`${assetBase}/static/pdf-${formType}/first-page.pdf`),
     fetch(
-      `${assetBase}/pdf-${formType}/people-${getScoreLabel(
+      `${assetBase}/static/pdf-${formType}/people-${getScoreLabel(
         surveyScores.People
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/pdf-${formType}/process-${getScoreLabel(
+      `${assetBase}/static/pdf-${formType}/process-${getScoreLabel(
         surveyScores.Process
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/pdf-${formType}/technology-${getScoreLabel(
+      `${assetBase}/static/pdf-${formType}/technology-${getScoreLabel(
         surveyScores.Technology
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/pdf-${formType}/information-${getScoreLabel(
+      `${assetBase}/static/pdf-${formType}/information-${getScoreLabel(
         surveyScores.Information
       ).toLowerCase()}.pdf`
     ),
-    fetch(`${assetBase}/pdf-${formType}/last-page.pdf`),
+    fetch(`${assetBase}/static/pdf-${formType}/last-page.pdf`),
     fetch(
-      `${assetBase}/pdf-common/people-${getScoreLabel(
+      `${assetBase}/static/pdf-common/people-${getScoreLabel(
         surveyScores.People
       ).toLowerCase()}.png`
     ),
     fetch(
-      `${assetBase}/pdf-common/process-${getScoreLabel(
+      `${assetBase}/static/pdf-common/process-${getScoreLabel(
         surveyScores.Process
       ).toLowerCase()}.png`
     ),
     fetch(
-      `${assetBase}/pdf-common/technology-${getScoreLabel(
+      `${assetBase}/static/pdf-common/technology-${getScoreLabel(
         surveyScores.Technology
       ).toLowerCase()}.png`
     ),
     fetch(
-      `${assetBase}/pdf-common/information-${getScoreLabel(
+      `${assetBase}/static/pdf-common/information-${getScoreLabel(
         surveyScores.Information
       ).toLowerCase()}.png`
     ),
@@ -268,25 +298,6 @@ const createPdf = async (formType, info, link, surveyScores) => {
   return true;
 };
 
-const parseQS = queryString.parse(
-  typeof window !== 'undefined' ? window.location.search : ''
-);
-
-let csAnswers;
-let csAutoAnswer = false;
-let csFormType = 'spb';
-
-if (parseQS['CS-ANSWERS']) {
-  csAnswers = JSON.parse(parseQS['CS-ANSWERS']);
-}
-if (parseQS['CS-AUTO-ANSWERS']) {
-  csAutoAnswer = true;
-}
-
-if (parseQS['CS-FORM-type']) {
-  csFormType = parseQS['CS-FORM-type'];
-}
-
 const makeAnswers = (Data) => {
   const results = {};
   Object.keys(Data).map((area) => {
@@ -312,11 +323,16 @@ const makeViewQuestions = (Data) => {
 };
 
 function App() {
+  const formType = csFormType;
+
   const seenChart = useRef(false);
   const selectedAnswer = useRef(false);
   const formEmail = useRef();
   const formName = useRef();
-  const formType = csFormType;
+
+  const Questions = formType === 'spb' ? spbQuestions : mwmQuestions;
+  const Recommendations =
+    formType === 'spb' ? spbRecommendations : mwmRecommendations;
 
   const [agreed, setAgreed] = useState(false);
   const [showFormError, setShowFormError] = useState(false);
@@ -327,32 +343,14 @@ function App() {
   const [scores, setScores] = useState({});
   const [viewResult, setViewResult] = useState();
 
-  const [FormData, setFormData] = useState();
-
-  const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
-  const [viewQuestion, setViewQuestion] = useState(makeViewQuestions(FormData));
-  const [viewArea, setViewArea] = useState(Object.keys(FormData)[0]);
+  const [answers, setAnswers] = useState(csAnswers || makeAnswers(Questions));
+  const [viewQuestion, setViewQuestion] = useState(
+    makeViewQuestions(Questions)
+  );
+  const [viewArea, setViewArea] = useState(Object.keys(Questions)[0]);
 
   const ref = useRef(null);
   const loaded = useRef();
-
-  useEffect(() => {
-    const loadData = async () => {
-      await Promise.all([
-        fetch(`${assetBase}/questions/${formType}.js`),
-        fetch(`${assetBase}/questions/${formType}.js`),
-        fetch(
-          `${assetBase}/pdf-${formType}/people-${getScoreLabel(
-            surveyScores.People
-          ).toLowerCase()}.pdf`
-        ),
-
-import FormData from './widgets/questions-spb';
-import ResultsData from './widgets/results-spb';
-    }
-
-    loadData();
-  });
 
   const getContactClick = () => {
     const FormAnswers = `${window.location.protocol}//${window.location.host}${
@@ -589,7 +587,7 @@ import ResultsData from './widgets/results-spb';
                 <Row>
                   <Col md={3} className="d-none d-md-block">
                     <Nav variant="pills" className="flex-column">
-                      {Object.keys(FormData).map((area) => (
+                      {Object.keys(Questions).map((area) => (
                         <Nav.Item key={`tab:${area}`}>
                           <Nav.Link
                             eventKey={area}
@@ -631,7 +629,7 @@ import ResultsData from './widgets/results-spb';
                       xs="2"
                       sm="4"
                     >
-                      {Object.keys(FormData).map((area) => (
+                      {Object.keys(Questions).map((area) => (
                         <Col key={`topnav:${area}`}>
                           <Button
                             variant="link"
@@ -649,7 +647,7 @@ import ResultsData from './widgets/results-spb';
                       ))}
                     </Row>
                     <Tab.Content className="text-left">
-                      {Object.keys(FormData).map((area, areaIndex) => (
+                      {Object.keys(Questions).map((area, areaIndex) => (
                         <Tab.Pane
                           eventKey={area}
                           key={`tabpane:${area}`}
@@ -658,7 +656,7 @@ import ResultsData from './widgets/results-spb';
                           <Accordion
                             activeKey={`question:${area}:${viewQuestion[area]}`}
                           >
-                            {FormData[area].questions.map(
+                            {Questions[area].questions.map(
                               (question, questionsIndex) => (
                                 <Card
                                   key={`question:${area}:${questionsIndex.toString()}`}
@@ -782,7 +780,7 @@ import ResultsData from './widgets/results-spb';
                         </button>
                       </div>
                       {
-                        ResultsData[viewResult][
+                        Recommendations[viewResult][
                           getScoreLabel(scores[viewResult])
                         ]
                       }
@@ -859,6 +857,7 @@ import ResultsData from './widgets/results-spb';
                             if (typeof window !== 'undefined') {
                               window.setTimeout(() => {
                                 setShowGetPdf(false);
+                                sendingPdf(false);
                               }, 200);
                             }
                           }
@@ -944,7 +943,7 @@ import ResultsData from './widgets/results-spb';
                 className="graph d-flex flex-column pl-0 pr-0 pr-md-3"
               >
                 <Row className="border-bottom flex-grow-1" noGutters>
-                  {Object.keys(FormData).map((area) => (
+                  {Object.keys(Questions).map((area) => (
                     <Col
                       key={`bar:${area}`}
                       className="graph-bar text-center align-items-end d-flex"
@@ -1016,7 +1015,7 @@ import ResultsData from './widgets/results-spb';
               <Col md="3" lg="2" className="d-block d-md-flex" />
               <Col md="9" lg="10" className="graph pl-0  pr-0 pr-md-3">
                 <Row noGutters>
-                  {Object.keys(FormData).map((area) => (
+                  {Object.keys(Questions).map((area) => (
                     <Col
                       key={`bar:${area}`}
                       className="graph-bar bar-title text-center mt-2 pr-0"

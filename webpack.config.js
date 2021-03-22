@@ -1,8 +1,9 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
 const BrotliPlugin = require('brotli-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 // We'll refer to our source and dist paths frequently, so let's store them here
 const PATH_SOURCE = path.join(__dirname, './src');
@@ -17,6 +18,7 @@ module.exports = (env) => {
   const environment = env.ENVIRONMENT;
   const isProduction = environment === 'production';
   console.log('WEBPACK ENV:', environment);
+  console.log('CS_FORM:', env.CS_FORM);
 
   return {
     // Tell Webpack to do some optimizations for our environment (development
@@ -30,8 +32,9 @@ module.exports = (env) => {
     // be configured to do a lot more.
     devServer: {
       // The dev server will serve content from this directory.
-      contentBase: path.join(__dirname, './static'),
-      publicPath: PATH_DIST,
+      contentBase: [PATH_DIST, path.join(__dirname, 'static')],
+      publicPath: '/',
+      hot: true,
 
       // Specify a host. (Defaults to 'localhost'.)
       host: 'localhost',
@@ -153,7 +156,14 @@ module.exports = (env) => {
     },
 
     plugins: [
-      new Dotenv(),
+      new webpack.DefinePlugin({
+        'process.env.CS_FORM': JSON.stringify(env.CS_FORM),
+        'process.env.ENVIRONMENT': JSON.stringify(env.ENVIRONMENT),
+      }),
+
+      new CopyPlugin({
+        patterns: [{ from: './static', to: './static' }],
+      }),
 
       isProduction
         ? new BrotliPlugin({
