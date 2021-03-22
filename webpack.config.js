@@ -30,7 +30,8 @@ module.exports = (env) => {
     // be configured to do a lot more.
     devServer: {
       // The dev server will serve content from this directory.
-      contentBase: PATH_DIST,
+      contentBase: path.join(__dirname, './static'),
+      publicPath: PATH_DIST,
 
       // Specify a host. (Defaults to 'localhost'.)
       host: 'localhost',

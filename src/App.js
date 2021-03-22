@@ -21,9 +21,6 @@ import queryString from 'query-string';
 
 import { PDFDocument } from 'pdf-lib';
 
-import FormData from './widgets/questions';
-import ResultsData from './widgets/results';
-
 const assetBase = 'https://capabilitysource.com';
 
 const validateEmail = (email) => {
@@ -42,7 +39,7 @@ const getScoreLabel = (score) =>
     ? 'Basic'
     : 'Adhoc';
 
-const alertUser = async (toObj, spbPdf) => {
+const alertUser = async (formType, toObj, ResultsPDF) => {
   await fetch('https://mandrillapp.com/api/1.0/messages/send-template.json', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
     mode: 'cors', // no-cors, *cors, same-origin
@@ -74,8 +71,8 @@ const alertUser = async (toObj, spbPdf) => {
         attachments: [
           {
             type: 'application/pdf',
-            name: 'SPB-Results.pdf',
-            content: spbPdf,
+            name: `cs-${formType}-results.pdf`,
+            content: ResultsPDF,
           },
         ],
       },
@@ -135,49 +132,49 @@ const alertCS = async (toObj, link) => {
   return true;
 };
 
-const createPdf = async (info, link, surveyScores) => {
+const createPdf = async (formType, info, link, surveyScores) => {
   const ratio = 0.24;
 
   await Promise.all([
-    fetch(`${assetBase}/pdf/first-page.pdf`),
+    fetch(`${assetBase}/pdf-${formType}/first-page.pdf`),
     fetch(
-      `${assetBase}/pdf/people-${getScoreLabel(
+      `${assetBase}/pdf-${formType}/people-${getScoreLabel(
         surveyScores.People
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/pdf/process-${getScoreLabel(
+      `${assetBase}/pdf-${formType}/process-${getScoreLabel(
         surveyScores.Process
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/pdf/technology-${getScoreLabel(
+      `${assetBase}/pdf-${formType}/technology-${getScoreLabel(
         surveyScores.Technology
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/pdf/information-${getScoreLabel(
+      `${assetBase}/pdf-${formType}/information-${getScoreLabel(
         surveyScores.Information
       ).toLowerCase()}.pdf`
     ),
-    fetch(`${assetBase}/pdf/last-page.pdf`),
+    fetch(`${assetBase}/pdf-${formType}/last-page.pdf`),
     fetch(
-      `${assetBase}/pdf/people-${getScoreLabel(
+      `${assetBase}/pdf-common/people-${getScoreLabel(
         surveyScores.People
       ).toLowerCase()}.png`
     ),
     fetch(
-      `${assetBase}/pdf/process-${getScoreLabel(
+      `${assetBase}/pdf-common/process-${getScoreLabel(
         surveyScores.Process
       ).toLowerCase()}.png`
     ),
     fetch(
-      `${assetBase}/pdf/technology-${getScoreLabel(
+      `${assetBase}/pdf-common/technology-${getScoreLabel(
         surveyScores.Technology
       ).toLowerCase()}.png`
     ),
     fetch(
-      `${assetBase}/pdf/information-${getScoreLabel(
+      `${assetBase}/pdf-common/information-${getScoreLabel(
         surveyScores.Information
       ).toLowerCase()}.png`
     ),
@@ -260,7 +257,7 @@ const createPdf = async (info, link, surveyScores) => {
       // invisAnchor.click();
 
       await alertCS(info, link);
-      await alertUser(info, base64Pdf);
+      await alertUser(formType, info, base64Pdf);
 
       return true;
     })
@@ -277,12 +274,17 @@ const parseQS = queryString.parse(
 
 let csAnswers;
 let csAutoAnswer = false;
+let csFormType = 'spb';
 
 if (parseQS['CS-ANSWERS']) {
   csAnswers = JSON.parse(parseQS['CS-ANSWERS']);
 }
 if (parseQS['CS-AUTO-ANSWERS']) {
   csAutoAnswer = true;
+}
+
+if (parseQS['CS-FORM-type']) {
+  csFormType = parseQS['CS-FORM-type'];
 }
 
 const makeAnswers = (Data) => {
@@ -314,6 +316,7 @@ function App() {
   const selectedAnswer = useRef(false);
   const formEmail = useRef();
   const formName = useRef();
+  const formType = csFormType;
 
   const [agreed, setAgreed] = useState(false);
   const [showFormError, setShowFormError] = useState(false);
@@ -321,13 +324,35 @@ function App() {
   const [showChart, setShowChart] = useState(false);
   const [showGetPdf, setShowGetPdf] = useState(false);
   const [sendingPdf, setSendingPdf] = useState(false);
-  const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
   const [scores, setScores] = useState({});
+  const [viewResult, setViewResult] = useState();
+
+  const [FormData, setFormData] = useState();
+
+  const [answers, setAnswers] = useState(csAnswers || makeAnswers(FormData));
   const [viewQuestion, setViewQuestion] = useState(makeViewQuestions(FormData));
   const [viewArea, setViewArea] = useState(Object.keys(FormData)[0]);
-  const [viewResult, setViewResult] = useState();
+
   const ref = useRef(null);
   const loaded = useRef();
+
+  useEffect(() => {
+    const loadData = async () => {
+      await Promise.all([
+        fetch(`${assetBase}/questions/${formType}.js`),
+        fetch(`${assetBase}/questions/${formType}.js`),
+        fetch(
+          `${assetBase}/pdf-${formType}/people-${getScoreLabel(
+            surveyScores.People
+          ).toLowerCase()}.pdf`
+        ),
+
+import FormData from './widgets/questions-spb';
+import ResultsData from './widgets/results-spb';
+    }
+
+    loadData();
+  });
 
   const getContactClick = () => {
     const FormAnswers = `${window.location.protocol}//${window.location.host}${
@@ -823,6 +848,7 @@ function App() {
                             setShowFormError(false);
                             setSendingPdf(true);
                             await createPdf(
+                              formType,
                               {
                                 email,
                                 name,

@@ -1,6 +1,6 @@
 {
   "name": "@greenjimmy/cs-chart",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Form questions with charted results",
   "main": "lib/index.js",
   "style": "lib/index.css",
@@ -8,10 +8,10 @@
     "lib/**/*"
   ],
   "scripts": {
-    "start": "webpack-dev-server --env.ENVIRONMENT=development --config webpack.config.js",
-    "build:prod": "webpack --env.ENVIRONMENT=production --config webpack.config.js",
-    "build:dev": "webpack --env.ENVIRONMENT=development --config webpack.config.js",
-    "build:package": "webpack --env.ENVIRONMENT=production --config webpack.package.config.js",
+    "start": "NODE_ENV=development webpack-dev-server --env.ENVIRONMENT=development --config webpack.config.js",
+    "build:prod": "NODE_ENV=production webpack --env.ENVIRONMENT=production --config webpack.config.js",
+    "build:dev": "NODE_ENV=development webpack --env.ENVIRONMENT=development --config webpack.config.js",
+    "build:package": "NODE_ENV=production webpack --env.ENVIRONMENT=production --config webpack.package.config.js",
     "css": "sass src/assets/css/index.scss lib/index.css",
     "pretty": "prettier --write ./src/**/*.js",
     "lint": "eslint ./src",

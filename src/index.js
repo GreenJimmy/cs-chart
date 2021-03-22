@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Container } from 'react-bootstrap';
 import App from './App';
 
-import './assets/css/index.scss';
+import './index.scss';
 
 ReactDOM.render(
   <Container>
