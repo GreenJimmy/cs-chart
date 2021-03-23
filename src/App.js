@@ -37,7 +37,7 @@ const parseQS = queryString.parse(
 
 let csAnswers;
 let csAutoAnswer = false;
-let csFormType =
+const csFormType =
   typeof window !== 'undefined' && window.CS_FORM
     ? window.CS_FORM
     : process.env.CS_FORM || 'spb';
@@ -47,10 +47,6 @@ if (parseQS['CS-ANSWERS']) {
 }
 if (parseQS['CS-AUTO-ANSWERS']) {
   csAutoAnswer = true;
-}
-
-if (parseQS['CS-FORM-type']) {
-  csFormType = parseQS['CS-FORM-type'];
 }
 
 const validateEmail = (email) => {
@@ -83,7 +79,10 @@ const alertUser = async (formType, toObj, ResultsPDF) => {
     referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
     body: JSON.stringify({
       key: '6SVyLcjG9Lt6Ff_UD_1JuA',
-      template_name: 'spb-readiness-calculator',
+      template_name:
+        formType === 'spb'
+          ? 'spb-readiness-calculator'
+          : 'mwm-benchmark-calculator',
       template_content: [
         {
           name: 'example name',
@@ -515,14 +514,19 @@ function App() {
         {!agreed ? (
           <Row className="justify-content-center">
             <Col className="text-center">
-              <h2>Agile Strategy Readiness</h2>
+              <h2 style={{ maxWidth: '600px', margin: '0 auto 1rem auto' }}>
+                {formType === 'spb'
+                  ? 'Agile Strategy Readiness'
+                  : 'Marketing Collaboration and Work Management Benchmark Calculator'}
+              </h2>
               <p>
                 Answer a minimum of 4 questions in each section to view results.
               </p>
               <small className="mb-3 d-block">
                 <em>
-                  By using the Readiness Calculator, you agree to the{' '}
-                  <a href="#0" onClick={() => setAllAgreement(true)}>
+                  By using the {formType === 'spb' ? 'Readiness' : 'Benchmark'}{' '}
+                  Calculator, you agree to the{' '}
+                  <a href="#0" onClick={() => setAllAgreement(!allAgreement)}>
                     Terms of Use
                   </a>
                   .
@@ -534,9 +538,11 @@ function App() {
                   style={{ height: '200px', overflowY: 'auto' }}
                 >
                   <p>
-                    Use of the Readiness Calculator and submission of your data
-                    via the online form is voluntary. By using the Readiness
-                    Calculator, you agree to share your data and responses with
+                    Use of the {formType === 'spb' ? 'Readiness' : 'Benchmark'}{' '}
+                    Calculator and submission of your data via the online form
+                    is voluntary. By using the{' '}
+                    {formType === 'spb' ? 'Readiness' : 'Benchmark'} Calculator,
+                    you agree to share your data and responses with
                     CapabilitySource. Upon submission of your data,
                     CapabilitySource will generate online content, and a report
                     will be distributed to the email address you provide. In
@@ -558,12 +564,13 @@ function App() {
                     analytics data on this website.
                   </p>
                   <p>
-                    Should you choose to use a Readiness Calculator on this
-                    website; information collected from you will be used for the
-                    purpose of understanding your business needs and responding
-                    accordingly. We may contact you via email or phone. You may
-                    choose to opt out of future communications at any time by
-                    contacting us at
+                    Should you choose to use a{' '}
+                    {formType === 'spb' ? 'Readiness' : 'Benchmark'} Calculator
+                    on this website; information collected from you will be used
+                    for the purpose of understanding your business needs and
+                    responding accordingly. We may contact you via email or
+                    phone. You may choose to opt out of future communications at
+                    any time by contacting us at
                     <a href="mailto:privacy@capabilitysource.com">
                       privacy@capabilitysource.com
                     </a>
@@ -576,7 +583,7 @@ function App() {
                 className="button-getintouch mx-2 mb-3"
                 onClick={() => setAgreed(true)}
               >
-                Calculate Readiness
+                Calculate {formType === 'spb' ? 'Readiness' : 'Benchmark'}
               </Button>
             </Col>
           </Row>
