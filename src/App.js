@@ -37,10 +37,7 @@ const parseQS = queryString.parse(
 
 let csAnswers;
 let csAutoAnswer = false;
-const csFormType =
-  typeof window !== 'undefined' && window.CS_FORM
-    ? window.CS_FORM
-    : process.env.CS_FORM || 'spb';
+const csFormType = process.env.CS_FORM || 'spb';
 
 if (parseQS['CS-ANSWERS']) {
   csAnswers = JSON.parse(parseQS['CS-ANSWERS']);
@@ -517,7 +514,7 @@ function App() {
               <h2 style={{ maxWidth: '600px', margin: '0 auto 1rem auto' }}>
                 {formType === 'spb'
                   ? 'Agile Strategy Readiness'
-                  : 'Marketing Collaboration and Work Management Benchmark Calculator'}
+                  : 'Marketing Work Management Benchmark'}
               </h2>
               <p>
                 Answer a minimum of 4 questions in each section to view results.
