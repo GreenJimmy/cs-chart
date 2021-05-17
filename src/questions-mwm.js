@@ -6,7 +6,7 @@ const FormData = {
           'How do internal and external workers know what they are supposed to do?',
         answers: [
           'Formal education is provided through structured classes and university-style curriculum.',
-          'Role based training and job aids are commonly used to learn how to work.',
+          'Role-based training and job aids are commonly used to learn how to work',
           'Mentoring and on-the-job training are the primary ways of learning.',
           'New workers are forced to figure things out on their own.',
           'No Answer',
@@ -29,7 +29,7 @@ const FormData = {
         answers: [
           'Most work is assigned to internal workers, with some  types of work occasionally assigned to specialized external agencies.',
           'Strategic and most tactical work is assigned to internal workers with some tactical work passed to external agencies.',
-          'Many types of work is commonly passed to external agencies.',
+          'Many types of work are commonly passed to external agencies.',
           'Virtually all strategic and tactical work is passed to external agencies.',
           'No Answer',
         ],
@@ -60,7 +60,7 @@ const FormData = {
         answers: [
           'Internal and external capacity is known and actively managed to meet future demand.',
           'Some internal capacity is known and used in planning activities.',
-          'Capacity is estimated but is not commonly known or used in decision making.',
+          'Capacity is estimated but is not commonly known or used in decision-making.',
           'Capacity is unknown.',
           'No Answer',
         ],
@@ -85,7 +85,7 @@ const FormData = {
         answers: [
           'All categories of projects are predefined and benchmarked at the task level and requests are automatically mapped into them.',
           'Projects are used to track the activities needed to complete a set of related jobs (e.g. campaign) but templates are not used and requests are not mapped into them.',
-          'Jobs are created to track tasks and status but the relationships between them is unknown and they are not linked to job requests.',
+          'Jobs are created to track tasks and status but the relationships between them are unknown and they are not linked to job requests.',
           'Activities are tracked in spreadsheets or emails but no standard and automated  project or job tracking system exists.',
           'No Answer',
         ],
@@ -94,7 +94,7 @@ const FormData = {
         question: 'How are objectives set and linked from top to bottom?',
         answers: [
           'Strategies are tied to initiatives using OKR style goals, measures and planned activities.',
-          'Objectives are defined in strategies and used to guide annual program plans and project level goals and priorities.',
+          'Objectives are defined in strategies and used to guide annual program plans and project-level goals and priorities.',
           'Objectives are defined in strategies and used to guide annual program plans but are not cascaded to projects.',
           'Objectives may exist in strategies but are not cascaded to programs or projects.',
           'No Answer',
@@ -123,8 +123,8 @@ const FormData = {
       {
         question: 'How are processes and procedures adjusted and improved?',
         answers: [
-          'Standard types of work are actively tracked and analyzed from end-to-end. Improvement insights are frequently evaluated used to improve work flow templates. AI may be used to optimize workflow.',
-          'Standard types of work is tracked but  may occur in multiple collaboration systems. Improvement insights are occasionally evaluated when a problem occurs or new technology is introduced. ',
+          'Standard types of work are actively tracked and analyzed from end-to-end. Improvement insights are frequently evaluated and used to improve work flow templates. AI may be used to optimize workflow.',
+          'Standard types of work are tracked but may occur in multiple collaboration systems. Improvement insights are occasionally evaluated when a problem occurs or new technology is introduced.',
           'Standard types of work and work logs exist but they are not used or evaluated to improve processes and no formal  improvement occurs. Processes are dated and often do not align with business needs.',
           'Processes are implemented and sometimes automated but no method of evaluating and improving them exists.',
           'No Answer',
@@ -140,7 +140,7 @@ const FormData = {
         answers: [
           'Centralized and integrated, best-of-breed digital technologies are used for planning, budgeting, content, production, analysis and task management activities.',
           'Best-of-breed digital technologies are used for planning, budgeting, content, production, analysis and task management activities but they are not shared or integrated across functional teams and external providers.',
-          'Generic collaboration technologies are used to exchange work within and across internal teams but exchanges are not mapped to higher level projects and email is used for external providers.',
+          'Generic collaboration technologies are used to exchange work within and across internal teams, but exchanges are not mapped to higher-level projects and email is used for external providers.',
           'No modern work management or collaboration systems are in use and work is exchanged in email or manually. ',
           'No Answer',
         ],
@@ -148,7 +148,7 @@ const FormData = {
       {
         question: 'How is human effort optimized and focused?',
         answers: [
-          'The majority of non-creative human activities are automated using business rules, automated workflow, data enrichment services, bots and virtual agents. Everything that can be automated is automated.',
+          'The majority of non-creative human activities are automated using business rules, automated workflow, data-enrichment services, bots and virtual agents. Everything that can be automated is automated.',
           'Human work activities are included in standard workstreams and orchestrated in work management technologies, however, recurring manual tasks are simply tracked, not automated with bots and virtual agents.',
           'Some human activities are orchestrated in applications but the work is fragmented and requires considerable human effort to stitch tasks together and make basic decisions that could be automated with bots and virtual agents.',
           'All human activities involved in a workstream are conducted by humans in siloed systems. Humans must know how to manually complete each activity and who to pass it to upon completion. ',
@@ -158,10 +158,10 @@ const FormData = {
       {
         question: 'How are best-of-breed technologies used and integrated?',
         answers: [
-          'Tools are integrated at the data and user experience levels so that multiple best-of-breed systems appear to the user as one unified system. Systems are designed around the worker experience.',
-          'Tools are integrated at the data level but they still appear as different tools that were not designed to work together and have been roughly assembled to support the worker experience.',
-          'Some tools may be integrated at the data level to reduce data re-entry but some re-entry is still required and tools are not accessible in a common user experience. Each tool requires its own screen and login and looks completely different in the worker experience.',
-          'Tools are generic and not integrated at the data or user experience levels. Switching between clunky tools is a significant frustration and efficiency problem.',
+          'Tools are integrated at the data- and user experience-levels so that multiple best-of-breed systems appear to the user as one unified system. Systems are designed around the worker experience.',
+          'Tools are integrated at the data-level, but they still appear as different tools that were not designed to work together and have been roughly assembled to support the worker experience.',
+          'Some tools may be integrated at the data-level to reduce data re-entry, but some re-entry is still required and tools are not accessible in a common user experience. Each tool requires its own screen and login and looks completely different in the worker experience.',
+          'Tools are generic and not integrated at the data- or user experience-levels. Switching between clunky tools is a significant frustration and efficiency problem.',
           'No Answer',
         ],
       },
@@ -169,8 +169,8 @@ const FormData = {
         question: 'How is user engagement encouraged and tracked?',
         answers: [
           'Personalization, education and best-of-breed tools and active interaction monitoring are used to engage users and measure adoption. Integrated user experiences are provided to meet the needs of specific types of workers.  Users think technologies help them do a better job.',
-          'Education and best-of-breed tools are provided but worker interactions are not used to measure engagement. The hope is that if "we build it, they will come" and use the technology provided. ',
-          'Feedback on technology and its usefulness is solicited but only when new rollouts take place. No ongoing activities occur to promote technology use and determine its alignment with business needs. ',
+          'Education and best-of-breed tools are provided, but worker interactions are not used to measure engagement. The hope is, that if “we build it, they will come” and use the technology provided.',
+          'Feedback on technology and its usefulness is solicited but only when new rollouts take place. No ongoing activities occur to promote technology use and determine its alignment with business needs.',
           'Worker engagement and adoption is not tracked or measured. Use of the technology provided and its alignment with worker needs is unknown.',
           'No Answer',
         ],
@@ -180,7 +180,7 @@ const FormData = {
           'How are planning, project and production systems integrated?',
         answers: [
           'Master data is managed in specialized product information management (PIM), customer data profile (CDP) and marketing work management (MWM) systems and integrated with production and data systems using a single cloud platform. Tracking codes propagate from plans to vehicle instances for direct attribution.',
-          'Master data is managed in multiple data repositories and integrated using a single cloud integration platform or central services API. Tracking codes exist for some vehicle instances but most attribution Is inferred. ',
+          'Master data is managed in multiple data repositories and integrated using a single cloud integration platform or central services API. Tracking codes exist for some vehicle instances but most attribution is inferred.',
           'Master data exists in multiple, somewhat isolated systems and may be out of sync between planning and production. Some data is loaded into centralized data lakes but linking and integrating is manual. Attribution is possible in some channels but not in others.',
           'Master data is isolated and different versions and definitions exist in different systems. Little to no integration exists between planning, production and analytic systems and attribution is completely inferred based on flawed data. ',
           'No Answer',
@@ -204,8 +204,8 @@ const FormData = {
         question:
           'How is strategy, planning, consumer, product and project information accessed?',
         answers: [
-          'All types of data is packaged and available securely to internal and external workers and accessed with cloud based, user friendly analysis and data extraction tools. Personal data is automatically masked.',
-          'Most types of data is available securely to internal workers and accessible from a central repository with specialized data tools. Personal data is manually masked. Access is tightly controlled at the user account level.',
+          'All types of data are packaged and available securely to internal and external workers and accessed with cloud-based, user-friendly analysis and data extraction tools. Personal data is automatically masked.',
+          'Most types of data are available securely to internal workers and accessible from a central repository with specialized data tools. Personal data is manually masked. Access is tightly controlled at the user account level.',
           'Some data is available in a centralized data lake but it is not packaged, aggregated or masked and may not be current. Access is limited to a few trusted individuals that have full data access and extraction is manual.',
           'Little to no centralized data exists. Data must be manually pulled from source systems by IT specialists and aggregated manually each time it is needed. ',
           'No Answer',
@@ -215,10 +215,10 @@ const FormData = {
         question:
           'How is strategy, planning, consumer, product and project information used?',
         answers: [
-          'All types of customer, behavioral and product data is used to set OKR goals and guide priority decisions, personalize and improve the performance of in-flight initiatives. AI and  ML is in common use across all interaction channels. Performance data is very useful in setting strategy.',
+          'All types of customer, behavioral and product data are used to set OKR goals and guide priority decisions, personalize and improve the performance of in-flight initiatives. AI and ML is in common use across all interaction channels. Performance data is very useful in setting strategy.',
           'Customer, behavioral and product data is used to personalize and improve the performance of future initiatives, but does not impact in-flight initiatives. Data is used to personalize interactions but not in real-time. AI and ML is used in isolated channels. Performance data accuracy is useful in setting strategy.',
-          'Customer and product data is used to personalize emails, digital channel behavioral data is not used to guide strategy or personalize massaging.  AI and ML are not used. Performance data is often questioned and may be considered when setting strategy.',
-          'Most communications are generic with little to no personalization. Past interactions, responses and conversions are often not considering and preferences are not always honored. Performance data is limited to basic receipt or view data and is not used in setting strategy.',
+          'Customer and product data is used to personalize emails, digital channel behavioral data is not used to guide strategy or personalize messaging. AI and ML are not used. Performance data is often questioned and may be considered when setting strategy.',
+          'Most communications are generic with little to no personalization. Past interactions, responses and conversions are often not considered and preferences are not always honored. Performance data is limited to basic receipt or view data and is not used in setting strategy.',
           'No Answer',
         ],
       },
@@ -228,8 +228,8 @@ const FormData = {
         answers: [
           'Cloud-based and integrated  technologies are used to manage customer, product and project information as well as scrub and enrich all types of customer data in near real-time.',
           'Customer data is actively scrubbed and enriched using batch-based internal and external data services from a variety of specialized providers. ',
-          'Customer data is occasionally scrubbed  using a combination of self service tools and data lists from consumer data providers.',
-          'Customer data is rarely scrubbed and often becomes dated and inaccurate as customer records age. Third party data sources are not used maintain data quality.',
+          'Customer data is occasionally scrubbed using a combination of self-service tools and data lists from consumer data providers.',
+          'Customer data is rarely scrubbed and often becomes dated and inaccurate as customer records age. Third-party data sources are not used to maintain data quality.',
           'No Answer',
         ],
       },
@@ -237,7 +237,7 @@ const FormData = {
         question:
           'How meaningful and actionable is consumer, product and project information?',
         answers: [
-          'Information is actively used to evaluate and adjust in-flight initiative content, cadence and channel mix',
+          'Information is actively used to evaluate and adjust in-flight initiative content, cadence, and channel mix',
           'Information is frequently used to evaluate and adjust future initiative content, cadence and channel mix',
           'Information is occasionally used to evaluate and adjust future initiative content, cadence and channel mix.',
           'Information is rarely used to evaluate and adjust future initiative content, cadence and channel mix.',

@@ -11,6 +11,7 @@ import {
   Form,
   Spinner,
 } from 'react-bootstrap';
+import ReactGA from 'react-ga';
 import {
   BsCheck,
   BsCheckBox,
@@ -26,6 +27,9 @@ import spbRecommendations from './recommendations-spb';
 import mwmQuestions from './questions-mwm';
 import mwmRecommendations from './recommendations-mwm';
 
+const trackingId = 'UA-62474262-1'; // Replace with your Google Analytics tracking ID
+ReactGA.initialize(trackingId);
+
 const assetBase =
   typeof window !== 'undefined' && window.ENVIRONMENT === 'production'
     ? 'https://capabilitysource.com'
@@ -38,6 +42,15 @@ const parseQS = queryString.parse(
 let csAnswers;
 let csAutoAnswer = false;
 const csFormType = process.env.CS_FORM || 'spb';
+
+const trackEvent = (action, label) => {
+  console.log('Tracking', action, label);
+  ReactGA.event({
+    category: `${csFormType === 'spb' ? 'Readiness' : 'Benchmark'} Form`,
+    action,
+    label,
+  });
+};
 
 if (parseQS['CS-ANSWERS']) {
   csAnswers = JSON.parse(parseQS['CS-ANSWERS']);
@@ -526,7 +539,13 @@ function App() {
                 <em>
                   By using the {formType === 'spb' ? 'Readiness' : 'Benchmark'}{' '}
                   Calculator, you agree to the{' '}
-                  <a href="#0" onClick={() => setAllAgreement(!allAgreement)}>
+                  <a
+                    href="#0"
+                    onClick={() => {
+                      setAllAgreement(!allAgreement);
+                      trackEvent('Agreed Terms of Use');
+                    }}
+                  >
                     Terms of Use
                   </a>
                   .
@@ -581,7 +600,10 @@ function App() {
               <Button
                 size="lg"
                 className="button-getintouch mx-2 mb-3"
-                onClick={() => setAgreed(true)}
+                onClick={() => {
+                  setAgreed(true);
+                  trackEvent('Started form');
+                }}
               >
                 Calculate {formType === 'spb' ? 'Readiness' : 'Benchmark'}
               </Button>
@@ -599,7 +621,10 @@ function App() {
                           <Nav.Link
                             eventKey={area}
                             className={`${area} d-flex align-items-center`}
-                            onClick={() => setViewArea(area)}
+                            onClick={() => {
+                              setViewArea(area);
+                              trackEvent('Opened area', area);
+                            }}
                           >
                             {area}
                             <BsCheck
@@ -617,7 +642,10 @@ function App() {
                       className="mt-5 mb-3 button-results"
                       block
                       disabled={!canViewChart()}
-                      onClick={() => setShowChart(true)}
+                      onClick={() => {
+                        setShowChart(true);
+                        trackEvent('Opened results');
+                      }}
                       variant="custom"
                     >
                       VIEW RESULTS
@@ -643,7 +671,10 @@ function App() {
                             className={`${area} ${
                               area === viewArea ? 'active' : ''
                             } d-flex align-items-center justify-content-center`}
-                            onClick={() => setViewArea(area)}
+                            onClick={() => {
+                              setViewArea(area);
+                              trackEvent('Opened area', area);
+                            }}
                           >
                             {area}
                             {areaComplete(area) ? (
@@ -679,6 +710,13 @@ function App() {
                                     }`}
                                     onClick={() => {
                                       setViewingQuestion(area, questionsIndex);
+                                      trackEvent(
+                                        'Opened question',
+                                        `${area}: [${questionsIndex.toString()}]${question.question.substring(
+                                          0,
+                                          30
+                                        )}`
+                                      );
                                     }}
                                   >
                                     <div className="d-inline-flex">
@@ -717,13 +755,23 @@ function App() {
                                                   ? 'selected'
                                                   : ''
                                               }
-                                              onClick={() =>
+                                              onClick={() => {
                                                 answered(
                                                   area,
                                                   questionsIndex,
                                                   4 - answersIndex
-                                                )
-                                              }
+                                                );
+                                                trackEvent(
+                                                  'Answered question',
+                                                  `${area}: [${questionsIndex.toString()}]${question.question.substring(
+                                                    0,
+                                                    30
+                                                  )}: [${answersIndex.toString()}]${answer.substring(
+                                                    0,
+                                                    30
+                                                  )}`
+                                                );
+                                              }}
                                             >
                                               {answer}
                                             </ListGroup.Item>
@@ -747,7 +795,10 @@ function App() {
                 className="mt-5 mb-3 button-results d-block d-md-none"
                 block
                 disabled={!canViewChart()}
-                onClick={() => setShowChart(true)}
+                onClick={() => {
+                  setShowChart(true);
+                  trackEvent('Viewed results');
+                }}
                 variant="custom"
               >
                 VIEW RESULTS
@@ -780,7 +831,10 @@ function App() {
                         <button
                           type="button"
                           className="close"
-                          onClick={() => setViewResult(null)}
+                          onClick={() => {
+                            setViewResult(null);
+                            trackEvent('Closed results');
+                          }}
                         >
                           <span aria-hidden="true">×</span>
                           <span className="sr-only">Close</span>
@@ -813,7 +867,10 @@ function App() {
                           top: '-2rem',
                           right: '-1rem',
                         }}
-                        onClick={() => setShowGetPdf(false)}
+                        onClick={() => {
+                          setShowGetPdf(false);
+                          trackEvent('Closed get PDF');
+                        }}
                       >
                         <span aria-hidden="true">×</span>
                         <span className="sr-only">Close</span>
@@ -846,6 +903,8 @@ function App() {
                         onClick={async () => {
                           const name = formName.current.value;
                           const email = formEmail.current.value;
+
+                          trackEvent('Request email PDF');
 
                           if (!validateEmail(email)) {
                             setShowFormError(true);
@@ -898,14 +957,20 @@ function App() {
                 <Button
                   size="lg"
                   className="button-getintouch mx-2 mb-3"
-                  onClick={() => setShowGetPdf(true)}
+                  onClick={() => {
+                    setShowGetPdf(true);
+                    trackEvent('Opened get PDF');
+                  }}
                 >
                   Get Results
                 </Button>
                 <Button
                   size="lg"
                   className="button-getintouch-outline mx-2 mb-3"
-                  onClick={() => setShowChart(false)}
+                  onClick={() => {
+                    setShowChart(false);
+                    trackEvent('Closed results');
+                  }}
                 >
                   Change my Answers
                 </Button>
