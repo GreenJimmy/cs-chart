@@ -191,7 +191,7 @@ const FormData = {
         answers: [
           'In-house, skilled, experienced and certified administrators proactively manage user communities and respond quickly to user needs.',
           'In-house and external dedicated  administrators proactively manage user communities and work with IT counterparts to respond quickly to user needs.',
-          "IT specialists respond to user needs and escalate to internal or external support specialists if needed. Most IT specialists don't know the users or unique configurations and ways they use the system.",
+          'IT specialists respond to user needs and escalate to internal or external support specialists if needed. Most IT specialists don\'t know the users or unique configurations and ways they use the system.',
           'No formal support exists for administrators and users. User needs are either ignored or users must resort to communities and on-line documentation to troubleshoot and resolve their own problems.',
           'No Answer',
         ],

@@ -22,9 +22,9 @@ import queryString from 'query-string';
 
 import { PDFDocument } from 'pdf-lib';
 
-import spbQuestions from './questions-spb';
+import spbQuestions from './questions-spb-random';
 import spbRecommendations from './recommendations-spb';
-import mwmQuestions from './questions-mwm';
+import mwmQuestions from './questions-mwm-random';
 import mwmRecommendations from './recommendations-mwm';
 
 const trackingId = 'UA-62474262-1'; // Replace with your Google Analytics tracking ID
@@ -64,7 +64,8 @@ const csAgreed =
 
 const validateEmail = (email) => {
   // eslint-disable-next-line no-control-regex
-  const expression = /(?!.*\.{2})^([a-z\d!#$%&'*+\-/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+  const expression =
+    /(?!.*\.{2})^([a-z\d!#$%&'*+\-/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
 
   return expression.test(String(email).toLowerCase());
 };
@@ -313,7 +314,7 @@ const createPdf = async (formType, info, link, surveyScores) => {
 const makeAnswers = (Data) => {
   const results = {};
   Object.keys(Data).map((area) => {
-    results[area] = Array.from(Array(Data[area].questions.length), () =>
+    results[area] = Array.from(Array(Data[area].length), () =>
       csAutoAnswer ? Math.floor(Math.random() * 4) + 1 : 0
     );
 
@@ -342,11 +343,13 @@ function App() {
   const formEmail = useRef();
   const formName = useRef();
 
-  const Questions = formType === 'spb' ? spbQuestions : mwmQuestions;
+  // const Questions = formType === 'spb' ? spbQuestions : mwmQuestions;
   const Recommendations =
     formType === 'spb' ? spbRecommendations : mwmRecommendations;
-
   const [agreed, setAgreed] = useState(csAgreed);
+  const [Questions, setQuestions] = useState(
+    formType === 'spb' ? spbQuestions : mwmQuestions
+  );
   const [showFormError, setShowFormError] = useState(false);
   const [allAgreement, setAllAgreement] = useState(false);
   const [showChart, setShowChart] = useState(false);
@@ -377,6 +380,30 @@ function App() {
       setViewResult(null);
     }
   };
+  useEffect(() => {
+    const randomOrder = () => {
+      const newQuestions = {};
+
+      Object.keys(Questions).map((area) => {
+        newQuestions[area] = Questions[area].map((question) => ({
+          ...question,
+          answersOrder: [0].concat(
+            [1, 2, 3, 4].sort(() => 0.5 - Math.random())
+          ),
+        }));
+
+        return null;
+      });
+      setQuestions(newQuestions);
+      trackEvent(
+        `Started form: ${formType === 'spb' ? 'Readiness' : 'Benchmark'}`
+      );
+    };
+
+    if (Questions && !Questions.People[0].answersOrder) {
+      randomOrder();
+    }
+  }, [Questions]);
 
   useEffect(() => {
     window.addEventListener('click', turnOffResult);
@@ -602,7 +629,6 @@ function App() {
                 className="button-getintouch mx-2 mb-3"
                 onClick={() => {
                   setAgreed(true);
-                  trackEvent('Started form');
                 }}
               >
                 Calculate {formType === 'spb' ? 'Readiness' : 'Benchmark'}
@@ -694,95 +720,88 @@ function App() {
                           <Accordion
                             activeKey={`question:${area}:${viewQuestion[area]}`}
                           >
-                            {Questions[area].questions.map(
-                              (question, questionsIndex) => (
-                                <Card
-                                  key={`question:${area}:${questionsIndex.toString()}`}
+                            {Questions[area].map((question, questionsIndex) => (
+                              <Card
+                                key={`question:${area}:${questionsIndex.toString()}`}
+                              >
+                                <Accordion.Toggle
+                                  id={`question:${areaIndex}:${questionsIndex}`}
+                                  as={Card.Header}
+                                  eventKey={`question:${area}:${questionsIndex.toString()}`}
+                                  className={`d-flex align-items-center${
+                                    viewQuestion[area] === questionsIndex
+                                      ? ' selected'
+                                      : ''
+                                  }`}
+                                  onClick={() => {
+                                    setViewingQuestion(area, questionsIndex);
+                                    trackEvent(
+                                      'Opened question',
+                                      `${area}: [${questionsIndex.toString()}]${
+                                        question.question
+                                      }`
+                                    );
+                                  }}
                                 >
-                                  <Accordion.Toggle
-                                    id={`question:${areaIndex}:${questionsIndex}`}
-                                    as={Card.Header}
-                                    eventKey={`question:${area}:${questionsIndex.toString()}`}
-                                    className={`d-flex align-items-center${
-                                      viewQuestion[area] === questionsIndex
-                                        ? ' selected'
-                                        : ''
-                                    }`}
-                                    onClick={() => {
-                                      setViewingQuestion(area, questionsIndex);
-                                      trackEvent(
-                                        'Opened question',
-                                        `${area}: [${questionsIndex.toString()}]${question.question.substring(
-                                          0,
-                                          30
-                                        )}`
-                                      );
-                                    }}
-                                  >
-                                    <div className="d-inline-flex">
-                                      {answers[area][questionsIndex] > 0 ? (
-                                        <BsCheckBox
-                                          className="mr-3 checkbox"
-                                          size="2rem"
-                                        />
-                                      ) : (
-                                        <BsSquare
-                                          size="1.65rem"
-                                          style={{
-                                            margin: '0 1.15rem 0 .2rem',
-                                          }}
-                                        />
+                                  <div className="d-inline-flex">
+                                    {answers[area][questionsIndex] > 0 ? (
+                                      <BsCheckBox
+                                        className="mr-3 checkbox"
+                                        size="2rem"
+                                      />
+                                    ) : (
+                                      <BsSquare
+                                        size="1.65rem"
+                                        style={{
+                                          margin: '0 1.15rem 0 .2rem',
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="d-inline-flex">
+                                    {question.question}
+                                  </div>
+                                </Accordion.Toggle>
+                                <Accordion.Collapse
+                                  eventKey={`question:${area}:${questionsIndex.toString()}`}
+                                >
+                                  <Card.Body className="pl-5">
+                                    <ListGroup variant="flush">
+                                      {(question.answersOrder || []).map(
+                                        (answersIndex) => (
+                                          <ListGroup.Item
+                                            key={`answer:${area}:${questionsIndex.toString()}:${answersIndex.toString()}`}
+                                            className={
+                                              answers[area][questionsIndex] ===
+                                              answersIndex
+                                                ? 'selected'
+                                                : ''
+                                            }
+                                            onClick={() => {
+                                              answered(
+                                                area,
+                                                questionsIndex,
+                                                answersIndex
+                                              );
+                                              trackEvent(
+                                                'Answered question',
+                                                `${area}: [${questionsIndex.toString()}]${
+                                                  question.question
+                                                }: [${answersIndex.toString()}]${
+                                                  question.answers[answersIndex]
+                                                }`
+                                              );
+                                            }}
+                                          >
+                                            {question.answers[answersIndex]}
+                                          </ListGroup.Item>
+                                        )
                                       )}
-                                    </div>
-                                    <div className="d-inline-flex">
-                                      {question.question}
-                                    </div>
-                                  </Accordion.Toggle>
-                                  <Accordion.Collapse
-                                    eventKey={`question:${area}:${questionsIndex.toString()}`}
-                                  >
-                                    <Card.Body className="pl-5">
-                                      <ListGroup variant="flush">
-                                        {question.answers.map(
-                                          (answer, answersIndex) => (
-                                            <ListGroup.Item
-                                              key={`answer:${area}:${questionsIndex.toString()}:${answersIndex.toString()}`}
-                                              className={
-                                                answers[area][
-                                                  questionsIndex
-                                                ] ===
-                                                4 - answersIndex
-                                                  ? 'selected'
-                                                  : ''
-                                              }
-                                              onClick={() => {
-                                                answered(
-                                                  area,
-                                                  questionsIndex,
-                                                  4 - answersIndex
-                                                );
-                                                trackEvent(
-                                                  'Answered question',
-                                                  `${area}: [${questionsIndex.toString()}]${question.question.substring(
-                                                    0,
-                                                    30
-                                                  )}: [${answersIndex.toString()}]${answer.substring(
-                                                    0,
-                                                    30
-                                                  )}`
-                                                );
-                                              }}
-                                            >
-                                              {answer}
-                                            </ListGroup.Item>
-                                          )
-                                        )}
-                                      </ListGroup>
-                                    </Card.Body>
-                                  </Accordion.Collapse>
-                                </Card>
-                              )
-                            )}
+                                    </ListGroup>
+                                  </Card.Body>
+                                </Accordion.Collapse>
+                              </Card>
+                            ))}
                           </Accordion>
                         </Tab.Pane>
                       ))}
@@ -923,7 +942,7 @@ function App() {
                             if (typeof window !== 'undefined') {
                               window.setTimeout(() => {
                                 setShowGetPdf(false);
-                                sendingPdf(false);
+                                setSendingPdf(false);
                               }, 200);
                             }
                           }
