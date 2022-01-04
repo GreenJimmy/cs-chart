@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const BrotliPlugin = require('brotli-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 // We'll refer to our source and dist paths frequently, so let's store them here
 const PATH_SOURCE = path.join(__dirname, './src');
@@ -18,7 +19,6 @@ module.exports = (env) => {
   const environment = env.ENVIRONMENT;
   const isProduction = environment === 'production';
   console.log('WEBPACK ENV:', environment);
-  console.log('CS_FORM:', env.CS_FORM);
 
   return {
     // Tell Webpack to do some optimizations for our environment (development
@@ -60,15 +60,15 @@ module.exports = (env) => {
 
     optimization: {
       usedExports: true,
-      splitChunks: {
-        cacheGroups: {
-          commons: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      },
+      // splitChunks: {
+      //   cacheGroups: {
+      //     commons: {
+      //       test: /[\\/]node_modules[\\/]/,
+      //       name: 'vendors',
+      //       chunks: 'all',
+      //     },
+      //   },
+      // },
     },
 
     // The point or points to enter the application. This is where Webpack will
@@ -156,6 +156,7 @@ module.exports = (env) => {
     },
 
     plugins: [
+      new BundleAnalyzerPlugin(),
       new webpack.DefinePlugin({
         'process.env.CS_FORM': JSON.stringify(env.CS_FORM),
         'process.env.ENVIRONMENT': JSON.stringify(env.ENVIRONMENT),

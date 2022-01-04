@@ -5,11 +5,9 @@ import App from './App';
 
 import './index.scss';
 
-const csFormType = process.env.CS_FORM || 'spb';
-
 ReactDOM.render(
   <Container>
     <App />
   </Container>,
-  document.getElementById(`root-${csFormType}`)
+  document.getElementById('root-benchmark')
 );

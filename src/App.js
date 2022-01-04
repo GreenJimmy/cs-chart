@@ -41,7 +41,7 @@ const parseQS = queryString.parse(
 
 let csAnswers;
 let csAutoAnswer = false;
-const csFormType = process.env.CS_FORM || 'spb';
+const csFormType = window.CS_FORM || process.env.CS_FORM || 'spb';
 
 const trackEvent = (action, label) => {
   console.log('Tracking', action, label);
@@ -550,7 +550,7 @@ function App() {
 
   return (
     <>
-      <div ref={ref} id="cs-widget-chart">
+      <div ref={ref} id="cs-widget-chart" className="bg-white">
         {!agreed ? (
           <Row className="justify-content-center">
             <Col className="text-center">
@@ -606,8 +606,6 @@ function App() {
                     strategies. Any information you provide will be considered
                     non-confidential. We will not disclose, sell or rent this
                     information without your express written permission.
-                    CapabilitySource does not capture anonymous or demographic
-                    analytics data on this website.
                   </p>
                   <p>
                     Should you choose to use a{' '}
