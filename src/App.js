@@ -27,6 +27,8 @@ import spbRecommendations from './recommendations-spb';
 import mwmQuestions from './questions-mwm-random';
 import mwmRecommendations from './recommendations-mwm';
 
+const canViewResults = false;
+
 const trackingId = 'UA-62474262-1'; // Replace with your Google Analytics tracking ID
 ReactGA.initialize(trackingId);
 
@@ -41,7 +43,7 @@ const parseQS = queryString.parse(
 
 let csAnswers;
 let csAutoAnswer = false;
-const csFormType = window.CS_FORM || process.env.CS_FORM || 'spb';
+const csFormType = window.CS_FORM || process.env.CS_FORM || 'mwm';
 
 const trackEvent = (action, label) => {
   console.log('Tracking', action, label);
@@ -96,7 +98,7 @@ const alertUser = async (formType, toObj, ResultsPDF) => {
       template_name:
         formType === 'spb'
           ? 'spb-readiness-calculator'
-          : 'mwm-benchmark-calculator',
+          : 'mom-benchmark-calculator',
       template_content: [
         {
           name: 'example name',
@@ -114,7 +116,7 @@ const alertUser = async (formType, toObj, ResultsPDF) => {
         attachments: [
           {
             type: 'application/pdf',
-            name: `cs-${formType}-results.pdf`,
+            name: `cs-${formType === 'mwm' ? 'mom' : formType}-results.pdf`,
             content: ResultsPDF,
           },
         ],
@@ -178,29 +180,31 @@ const alertCS = async (toObj, link) => {
 const createPdf = async (formType, info, link, surveyScores) => {
   const ratio = 0.24;
 
+  const pdfFormType = formType === 'mwm' ? 'mom' : formType;
+
   await Promise.all([
-    fetch(`${assetBase}/static/pdf-${formType}/first-page.pdf`),
+    fetch(`${assetBase}/static/pdf-${pdfFormType}/first-page.pdf`),
     fetch(
-      `${assetBase}/static/pdf-${formType}/people-${getScoreLabel(
+      `${assetBase}/static/pdf-${pdfFormType}/people-${getScoreLabel(
         surveyScores.People
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/static/pdf-${formType}/process-${getScoreLabel(
+      `${assetBase}/static/pdf-${pdfFormType}/process-${getScoreLabel(
         surveyScores.Process
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/static/pdf-${formType}/technology-${getScoreLabel(
+      `${assetBase}/static/pdf-${pdfFormType}/technology-${getScoreLabel(
         surveyScores.Technology
       ).toLowerCase()}.pdf`
     ),
     fetch(
-      `${assetBase}/static/pdf-${formType}/information-${getScoreLabel(
+      `${assetBase}/static/pdf-${pdfFormType}/information-${getScoreLabel(
         surveyScores.Information
       ).toLowerCase()}.pdf`
     ),
-    fetch(`${assetBase}/static/pdf-${formType}/last-page.pdf`),
+    fetch(`${assetBase}/static/pdf-${pdfFormType}/last-page.pdf`),
     fetch(
       `${assetBase}/static/pdf-common/people-${getScoreLabel(
         surveyScores.People
@@ -302,6 +306,10 @@ const createPdf = async (formType, info, link, surveyScores) => {
       await alertCS(info, link);
       await alertUser(formType, info, base64Pdf);
 
+      if (window.CS_FORM_REDIRECT) {
+        window.location.href = window.CS_FORM_REDIRECT;
+      }
+
       return true;
     })
     .catch(() => {
@@ -355,6 +363,7 @@ function App() {
   const [showChart, setShowChart] = useState(false);
   const [showGetPdf, setShowGetPdf] = useState(false);
   const [sendingPdf, setSendingPdf] = useState(false);
+  const [showCalculate, setShowCalculate] = useState(false);
   const [scores, setScores] = useState({});
   const [viewResult, setViewResult] = useState();
 
@@ -419,7 +428,7 @@ function App() {
     setViewQuestion(newViewQuestion);
   };
 
-  const answered = (questionArea, questionIndex, score) => {
+  const answered = async (questionArea, questionIndex, score) => {
     const newAnswers = { ...answers };
     const allAreas = Object.keys(newAnswers);
     newAnswers[questionArea][questionIndex] = score;
@@ -480,7 +489,23 @@ function App() {
       }, 500);
     } else if (!seenChart.current) {
       seenChart.current = true;
-      setShowChart(true);
+      if (canViewResults) {
+        setShowChart(true);
+        trackEvent('Opened results');
+      } else {
+        setShowCalculate(true);
+        trackEvent('Sending results');
+        // TODO: GET THE EMAIL AND WHAT NOT, REDIRECT WHEN DONE
+        await createPdf(
+          formType,
+          {
+            email: window.CS_FORM_EMAIL,
+            name: window.CS_FORM_NAME,
+          },
+          getContactClick(),
+          scores
+        );
+      }
     }
 
     setAnswers(newAnswers);
@@ -557,10 +582,11 @@ function App() {
               <h2 style={{ maxWidth: '600px', margin: '0 auto 1rem auto' }}>
                 {formType === 'spb'
                   ? 'Planning Agility Benchmark'
-                  : 'Marketing Work Management Benchmark'}
+                  : 'Marketing Operations Maturity Benchmark'}
               </h2>
               <p>
-                Answer a minimum of 4 questions in each section to view results.
+                Answer a minimum of 4 questions in each section to{' '}
+                {canViewResults ? 'view' : 'access'} results.
               </p>
               <small className="mb-3 d-block">
                 <em>
@@ -634,200 +660,246 @@ function App() {
             </Col>
           </Row>
         ) : !showChart ? (
-          <Row>
-            <Col>
-              <Tab.Container activeKey={viewArea}>
-                <Row>
-                  <Col md={3} className="d-none d-md-block">
-                    <Nav variant="pills" className="flex-column">
-                      {Object.keys(Questions).map((area) => (
-                        <Nav.Item key={`tab:${area}`}>
-                          <Nav.Link
+          <>
+            <Row>
+              <Col>
+                <Tab.Container activeKey={viewArea}>
+                  <Row>
+                    <Col md={3} className="d-none d-md-block">
+                      <Nav variant="pills" className="flex-column">
+                        {Object.keys(Questions).map((area) => (
+                          <Nav.Item key={`tab:${area}`}>
+                            <Nav.Link
+                              eventKey={area}
+                              className={`${area} d-flex align-items-center`}
+                              onClick={() => {
+                                setViewArea(area);
+                                trackEvent('Opened area', area);
+                              }}
+                            >
+                              {area}
+                              <BsCheck
+                                size="2rem"
+                                className={`ml-auto${
+                                  !areaComplete(area) ? ' invisible' : ''
+                                }`}
+                              />
+                            </Nav.Link>
+                          </Nav.Item>
+                        ))}
+                      </Nav>
+                      <Button
+                        size="lg"
+                        className="mt-5 mb-3 button-results"
+                        block
+                        disabled={!canViewChart()}
+                        onClick={async () => {
+                          if (canViewResults) {
+                            setShowChart(true);
+                            trackEvent('Opened results');
+                          } else {
+                            setShowCalculate(true);
+                            trackEvent('Sending results');
+                            // TODO: GET THE EMAIL AND WHAT NOT, REDIRECT WHEN DONE
+                            await createPdf(
+                              formType,
+                              {
+                                email: window.CS_FORM_EMAIL,
+                                name: window.CS_FORM_NAME,
+                              },
+                              getContactClick(),
+                              scores
+                            );
+                          }
+                        }}
+                        variant="custom"
+                      >
+                        {canViewResults ? 'VIEW' : 'GET'} RESULTS
+                      </Button>
+                      {!canViewChart() ? (
+                        <small className="text-center d-block mx-3">
+                          Answer a minimum of 4 questions in each section to{' '}
+                          {canViewResults ? 'views' : 'access'} results.
+                        </small>
+                      ) : null}
+                    </Col>
+                    <Col md={9}>
+                      <Row
+                        noGutters
+                        className="d-flex d-md-none survey-top-nav"
+                        xs="2"
+                        sm="4"
+                      >
+                        {Object.keys(Questions).map((area) => (
+                          <Col key={`topnav:${area}`}>
+                            <Button
+                              variant="link"
+                              className={`${area} ${
+                                area === viewArea ? 'active' : ''
+                              } d-flex align-items-center justify-content-center`}
+                              onClick={() => {
+                                setViewArea(area);
+                                trackEvent('Opened area', area);
+                              }}
+                            >
+                              {area}
+                              {areaComplete(area) ? (
+                                <BsCheck className="ml-2" size="1.5rem" />
+                              ) : null}
+                            </Button>
+                          </Col>
+                        ))}
+                      </Row>
+                      <Tab.Content className="text-left">
+                        {Object.keys(Questions).map((area, areaIndex) => (
+                          <Tab.Pane
                             eventKey={area}
-                            className={`${area} d-flex align-items-center`}
-                            onClick={() => {
-                              setViewArea(area);
-                              trackEvent('Opened area', area);
-                            }}
+                            key={`tabpane:${area}`}
+                            className={area}
                           >
-                            {area}
-                            <BsCheck
-                              size="2rem"
-                              className={`ml-auto${
-                                !areaComplete(area) ? ' invisible' : ''
-                              }`}
-                            />
-                          </Nav.Link>
-                        </Nav.Item>
-                      ))}
-                    </Nav>
-                    <Button
-                      size="lg"
-                      className="mt-5 mb-3 button-results"
-                      block
-                      disabled={!canViewChart()}
-                      onClick={() => {
-                        setShowChart(true);
-                        trackEvent('Opened results');
-                      }}
-                      variant="custom"
-                    >
-                      VIEW RESULTS
-                    </Button>
-                    {!canViewChart() ? (
-                      <small className="text-center d-block mx-3">
-                        Answer a minimum of 4 questions in each section to view
-                        results.
-                      </small>
-                    ) : null}
-                  </Col>
-                  <Col md={9}>
-                    <Row
-                      noGutters
-                      className="d-flex d-md-none survey-top-nav"
-                      xs="2"
-                      sm="4"
-                    >
-                      {Object.keys(Questions).map((area) => (
-                        <Col key={`topnav:${area}`}>
-                          <Button
-                            variant="link"
-                            className={`${area} ${
-                              area === viewArea ? 'active' : ''
-                            } d-flex align-items-center justify-content-center`}
-                            onClick={() => {
-                              setViewArea(area);
-                              trackEvent('Opened area', area);
-                            }}
-                          >
-                            {area}
-                            {areaComplete(area) ? (
-                              <BsCheck className="ml-2" size="1.5rem" />
-                            ) : null}
-                          </Button>
-                        </Col>
-                      ))}
-                    </Row>
-                    <Tab.Content className="text-left">
-                      {Object.keys(Questions).map((area, areaIndex) => (
-                        <Tab.Pane
-                          eventKey={area}
-                          key={`tabpane:${area}`}
-                          className={area}
-                        >
-                          <Accordion
-                            activeKey={`question:${area}:${viewQuestion[area]}`}
-                          >
-                            {Questions[area].map((question, questionsIndex) => (
-                              <Card
-                                key={`question:${area}:${questionsIndex.toString()}`}
-                              >
-                                <Accordion.Toggle
-                                  id={`question:${areaIndex}:${questionsIndex}`}
-                                  as={Card.Header}
-                                  eventKey={`question:${area}:${questionsIndex.toString()}`}
-                                  className={`d-flex align-items-center${
-                                    viewQuestion[area] === questionsIndex
-                                      ? ' selected'
-                                      : ''
-                                  }`}
-                                  onClick={() => {
-                                    setViewingQuestion(area, questionsIndex);
-                                    trackEvent(
-                                      'Opened question',
-                                      `${area}: [${questionsIndex.toString()}]${
-                                        question.question
-                                      }`
-                                    );
-                                  }}
-                                >
-                                  <div className="d-inline-flex">
-                                    {answers[area][questionsIndex] > 0 ? (
-                                      <BsCheckBox
-                                        className="mr-3 checkbox"
-                                        size="2rem"
-                                      />
-                                    ) : (
-                                      <BsSquare
-                                        size="1.65rem"
-                                        style={{
-                                          margin: '0 1.15rem 0 .2rem',
-                                        }}
-                                      />
-                                    )}
-                                  </div>
-                                  <div className="d-inline-flex">
-                                    {question.question}
-                                  </div>
-                                </Accordion.Toggle>
-                                <Accordion.Collapse
-                                  eventKey={`question:${area}:${questionsIndex.toString()}`}
-                                >
-                                  <Card.Body className="pl-5">
-                                    <ListGroup variant="flush">
-                                      {(question.answersOrder || []).map(
-                                        (answersIndex) => (
-                                          <ListGroup.Item
-                                            key={`answer:${area}:${questionsIndex.toString()}:${answersIndex.toString()}`}
-                                            className={
-                                              answers[area][questionsIndex] ===
-                                              answersIndex
-                                                ? 'selected'
-                                                : ''
-                                            }
-                                            onClick={() => {
-                                              answered(
-                                                area,
-                                                questionsIndex,
-                                                answersIndex
-                                              );
-                                              trackEvent(
-                                                'Answered question',
-                                                `${area}: [${questionsIndex.toString()}]${
-                                                  question.question
-                                                }: [${answersIndex.toString()}]${
-                                                  question.answers[answersIndex]
-                                                }`
-                                              );
+                            <Accordion
+                              activeKey={`question:${area}:${viewQuestion[area]}`}
+                            >
+                              {Questions[area].map(
+                                (question, questionsIndex) => (
+                                  <Card
+                                    key={`question:${area}:${questionsIndex.toString()}`}
+                                  >
+                                    <Accordion.Toggle
+                                      id={`question:${areaIndex}:${questionsIndex}`}
+                                      as={Card.Header}
+                                      eventKey={`question:${area}:${questionsIndex.toString()}`}
+                                      className={`d-flex align-items-center${
+                                        viewQuestion[area] === questionsIndex
+                                          ? ' selected'
+                                          : ''
+                                      }`}
+                                      onClick={() => {
+                                        setViewingQuestion(
+                                          area,
+                                          questionsIndex
+                                        );
+                                        trackEvent(
+                                          'Opened question',
+                                          `${area}: [${questionsIndex.toString()}]${
+                                            question.question
+                                          }`
+                                        );
+                                      }}
+                                    >
+                                      <div className="d-inline-flex">
+                                        {answers[area][questionsIndex] > 0 ? (
+                                          <BsCheckBox
+                                            className="mr-3 checkbox"
+                                            size="2rem"
+                                          />
+                                        ) : (
+                                          <BsSquare
+                                            size="1.65rem"
+                                            style={{
+                                              margin: '0 1.15rem 0 .2rem',
                                             }}
-                                          >
-                                            {question.answers[answersIndex]}
-                                          </ListGroup.Item>
-                                        )
-                                      )}
-                                    </ListGroup>
-                                  </Card.Body>
-                                </Accordion.Collapse>
-                              </Card>
-                            ))}
-                          </Accordion>
-                        </Tab.Pane>
-                      ))}
-                    </Tab.Content>
+                                          />
+                                        )}
+                                      </div>
+                                      <div className="d-inline-flex">
+                                        {question.question}
+                                      </div>
+                                    </Accordion.Toggle>
+                                    <Accordion.Collapse
+                                      eventKey={`question:${area}:${questionsIndex.toString()}`}
+                                    >
+                                      <Card.Body className="pl-5">
+                                        <ListGroup variant="flush">
+                                          {(question.answersOrder || []).map(
+                                            (answersIndex) => (
+                                              <ListGroup.Item
+                                                key={`answer:${area}:${questionsIndex.toString()}:${answersIndex.toString()}`}
+                                                className={
+                                                  answers[area][
+                                                    questionsIndex
+                                                  ] === answersIndex
+                                                    ? 'selected'
+                                                    : ''
+                                                }
+                                                onClick={() => {
+                                                  answered(
+                                                    area,
+                                                    questionsIndex,
+                                                    answersIndex
+                                                  );
+                                                  trackEvent(
+                                                    'Answered question',
+                                                    `${area}: [${questionsIndex.toString()}]${
+                                                      question.question
+                                                    }: [${answersIndex.toString()}]${
+                                                      question.answers[
+                                                        answersIndex
+                                                      ]
+                                                    }`
+                                                  );
+                                                }}
+                                              >
+                                                {question.answers[answersIndex]}
+                                              </ListGroup.Item>
+                                            )
+                                          )}
+                                        </ListGroup>
+                                      </Card.Body>
+                                    </Accordion.Collapse>
+                                  </Card>
+                                )
+                              )}
+                            </Accordion>
+                          </Tab.Pane>
+                        ))}
+                      </Tab.Content>
+                    </Col>
+                  </Row>
+                </Tab.Container>
+                <Button
+                  size="lg"
+                  className="mt-5 mb-3 button-results d-block d-md-none"
+                  block
+                  disabled={!canViewChart()}
+                  onClick={() => {
+                    setShowChart(true);
+                    trackEvent('Viewed results');
+                  }}
+                  variant="custom"
+                >
+                  VIEW RESULTS
+                </Button>
+                {!canViewChart() ? (
+                  <small className="text-center d-block d-md-none mx-3">
+                    Answer a minimum of 4 questions in each section to view
+                    results.
+                  </small>
+                ) : null}
+              </Col>
+            </Row>
+            {showCalculate ? (
+              <div
+                id="result-content"
+                className="area-info d-flex align-items-start"
+              >
+                <Row className="justify-content-center w-100">
+                  <Col md="10" lg="8" xl="6">
+                    <div className="result-content border shadow text-center">
+                      <h3 className="mb-4">Calculating Results</h3>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="lg"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                    </div>
                   </Col>
                 </Row>
-              </Tab.Container>
-              <Button
-                size="lg"
-                className="mt-5 mb-3 button-results d-block d-md-none"
-                block
-                disabled={!canViewChart()}
-                onClick={() => {
-                  setShowChart(true);
-                  trackEvent('Viewed results');
-                }}
-                variant="custom"
-              >
-                VIEW RESULTS
-              </Button>
-              {!canViewChart() ? (
-                <small className="text-center d-block d-md-none mx-3">
-                  Answer a minimum of 4 questions in each section to view
-                  results.
-                </small>
-              ) : null}
-            </Col>
-          </Row>
+              </div>
+            ) : null}
+          </>
         ) : (
           <div className="graph-wrapper">
             {viewResult ? (
