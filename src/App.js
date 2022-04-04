@@ -48,7 +48,9 @@ const csFormType = window.CS_FORM || process.env.CS_FORM || 'mwm';
 const trackEvent = (action, label) => {
   console.log('Tracking', action, label);
   ReactGA.event({
-    category: `${csFormType === 'spb' ? 'Readiness' : 'Benchmark'} Form`,
+    category: `${
+      csFormType === 'spb' ? 'Readiness' : 'Benchmark Assessment'
+    } Form`,
     action,
     label,
   });
@@ -116,7 +118,11 @@ const alertUser = async (formType, toObj, ResultsPDF) => {
         attachments: [
           {
             type: 'application/pdf',
-            name: `cs-${formType === 'mwm' ? 'mom' : formType}-results.pdf`,
+            name: `${
+              formType === 'cs-mwm-results'
+                ? 'Marketing Operations Maturity Benchmark Assessment Results'
+                : formType
+            }.pdf`,
             content: ResultsPDF,
           },
         ],
@@ -582,7 +588,7 @@ function App() {
               <h2 style={{ maxWidth: '600px', margin: '0 auto 1rem auto' }}>
                 {formType === 'spb'
                   ? 'Planning Agility Benchmark'
-                  : 'Marketing Operations Maturity Benchmark'}
+                  : 'Marketing Operations Maturity Benchmark Assessment'}
               </h2>
               <p>
                 Answer a minimum of 4 questions in each section to{' '}
@@ -590,7 +596,8 @@ function App() {
               </p>
               <small className="mb-3 d-block">
                 <em>
-                  By using the {formType === 'spb' ? 'Readiness' : 'Benchmark'}{' '}
+                  By using the{' '}
+                  {formType === 'spb' ? 'Readiness' : 'Benchmark Assessment'}{' '}
                   Calculator, you agree to the{' '}
                   <a
                     href="#0"
@@ -610,11 +617,12 @@ function App() {
                   style={{ height: '200px', overflowY: 'auto' }}
                 >
                   <p>
-                    Use of the {formType === 'spb' ? 'Readiness' : 'Benchmark'}{' '}
+                    Use of the{' '}
+                    {formType === 'spb' ? 'Readiness' : 'Benchmark Assessment'}{' '}
                     Calculator and submission of your data via the online form
                     is voluntary. By using the{' '}
-                    {formType === 'spb' ? 'Readiness' : 'Benchmark'} Calculator,
-                    you agree to share your data and responses with
+                    {formType === 'spb' ? 'Readiness' : 'Benchmark Assessment'}{' '}
+                    Calculator, you agree to share your data and responses with
                     CapabilitySource. Upon submission of your data,
                     CapabilitySource will generate online content, and a report
                     will be distributed to the email address you provide. In
@@ -635,12 +643,12 @@ function App() {
                   </p>
                   <p>
                     Should you choose to use a{' '}
-                    {formType === 'spb' ? 'Readiness' : 'Benchmark'} Calculator
-                    on this website; information collected from you will be used
-                    for the purpose of understanding your business needs and
-                    responding accordingly. We may contact you via email or
-                    phone. You may choose to opt out of future communications at
-                    any time by contacting us at
+                    {formType === 'spb' ? 'Readiness' : 'Benchmark Assessment'}{' '}
+                    Calculator on this website; information collected from you
+                    will be used for the purpose of understanding your business
+                    needs and responding accordingly. We may contact you via
+                    email or phone. You may choose to opt out of future
+                    communications at any time by contacting us at
                     <a href="mailto:privacy@capabilitysource.com">
                       privacy@capabilitysource.com
                     </a>
@@ -655,7 +663,8 @@ function App() {
                   setAgreed(true);
                 }}
               >
-                Calculate {formType === 'spb' ? 'Readiness' : 'Benchmark'}
+                Calculate{' '}
+                {formType === 'spb' ? 'Readiness' : 'Benchmark Assessment'}
               </Button>
             </Col>
           </Row>
